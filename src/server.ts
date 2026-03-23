@@ -1,22 +1,29 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import express from 'express';
-import { loadEnv } from 'vite';
 import type { ViteDevServer } from 'vite';
 import { CONVERSATION_DETAILS } from './data/assorted-content';
 import { getPostPage, getPosts } from './lib/posts';
 import { getPublicSupabaseConfig } from './lib/supabase';
 import type { InitialData } from './types';
 
-// Load VITE_* variables from .env files into process.env
-const envVars = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
-for (const [key, value] of Object.entries(envVars)) {
-  if (!(key in process.env)) {
-    process.env[key] = value;
+const root = process.cwd();
+
+// In dev, load .env file vars into process.env. In production, Railway provides them directly.
+async function loadDevEnv() {
+  try {
+    const { loadEnv } = await import('vite');
+    const envVars = loadEnv('development', root, '');
+    for (const [key, value] of Object.entries(envVars)) {
+      if (!(key in process.env)) {
+        process.env[key] = value;
+      }
+    }
+  } catch {
+    // vite not available (production) — env vars come from Railway
   }
 }
-
-const root = process.cwd();
+await loadDevEnv();
 
 const PAGE_TITLES: Partial<Record<InitialData['page'], string>> = {
   accountability: 'Accountability - POM',
