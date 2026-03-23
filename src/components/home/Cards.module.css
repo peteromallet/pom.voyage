@@ -113,17 +113,12 @@
 
 .textContent {
   position: relative;
+  flex: 1;
   margin-bottom: 0;
   color: #444;
   opacity: 0.88;
   overflow: hidden;
   transition: opacity 0.25s ease;
-}
-
-:global(.card:not(.expanded)) .textContent {
-  max-height: 200px;
-  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
 }
 
 :global(.card.expanded) .textContent {
@@ -145,17 +140,8 @@
   line-height: 1.5;
 }
 
-:global(.card:not(.expanded)) .textContent p {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 :global(.card.expanded) .textContent p {
   display: block;
-  -webkit-line-clamp: unset;
 }
 
 :global(.card) .textContent p a {
