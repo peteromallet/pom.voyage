@@ -39,6 +39,6 @@ I still fuck up a lot, often overwork myself to the point of exhaustion, and try
 I may still fail - but failing while energetically pursuing something that has the potential to be profoundly meaningful is about as good a failure as there is.
 
 <video width="50%" controls>
-  <source src="../assets/output_apo8_prob4_apo8.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/output_apo8_prob4_apo8.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video> 

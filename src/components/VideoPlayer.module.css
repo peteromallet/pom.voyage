@@ -1,0 +1,90 @@
+.videoContainer {
+  position: relative;
+  width: 100%;
+  height: 0;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: 8px;
+  padding-bottom: 50%;
+  transition: padding-bottom 0.25s ease;
+}
+
+:global(.video-card.expanded) .videoContainer {
+  padding-bottom: 56%;
+}
+
+.thumbnail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(10%);
+  opacity: 1;
+  transform: scale(1);
+  transition: transform 0.35s ease, filter 0.35s ease, opacity 0.2s ease, visibility 0.2s ease;
+}
+
+:global(.video-card:hover) .thumbnail {
+  filter: grayscale(0%);
+}
+
+:global(.video-card.expanded) .thumbnail {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  transition: background-color 0.35s ease, opacity 0.2s ease, visibility 0.2s ease;
+}
+
+:global(.video-card.expanded) .overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.playIcon {
+  width: 64px;
+  height: 64px;
+  color: #fff;
+  opacity: 0.82;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+:global(.video-card.expanded) .playIcon {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.embed {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.videoContainer[data-revealed='true'] .thumbnail,
+.videoContainer[data-revealed='true'] .overlay {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.videoContainer[data-revealed='true'] .embed {
+  opacity: 1;
+  visibility: visible;
+}
+
+.embed iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}

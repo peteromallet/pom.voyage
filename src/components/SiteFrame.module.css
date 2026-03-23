@@ -1,0 +1,60 @@
+:global(.github-suggestion-footer) {
+  position: fixed;
+  right: 0;
+  bottom: 8px;
+  left: 0;
+  z-index: 1001;
+  padding: 5px 0;
+  color: #aaa;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out, bottom 0.3s ease-in-out;
+}
+
+:global(.github-suggestion-footer.visible) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+:global(.github-suggestion-text) {
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: rgba(251, 248, 239, 0.8);
+  font-size: 11px;
+}
+
+:global(.github-suggestion-footer a) {
+  position: relative;
+  padding-bottom: 1px;
+  color: #aaa;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+:global(.github-suggestion-footer a::after) {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: #ccc;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+:global(.github-suggestion-footer a:hover) {
+  color: #888;
+}
+
+:global(.github-suggestion-footer a:hover::after) {
+  background: #bbb;
+  transform: scaleX(0.7);
+}
+
+@media (max-width: 768px) {
+  :global(.github-suggestion-footer) {
+    display: none;
+  }
+}

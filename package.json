@@ -1,14 +1,23 @@
 {
   "name": "personal_website",
   "version": "1.0.0",
-  "description": "Personal website with blog functionality",
-  "main": "server.js",
+  "description": "Personal website migrated to React SSR with Vite and TypeScript",
+  "type": "module",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx src/server.ts",
+    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist/server && esbuild src/server.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/server.js",
+    "start": "node dist/server.js",
+    "migrate:posts": "tsx scripts/migrate-posts-to-supabase.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "keywords": ["personal", "website", "blog", "portfolio"],
+  "keywords": [
+    "personal",
+    "website",
+    "blog",
+    "portfolio"
+  ],
   "author": "Peter O'Malley",
   "license": "ISC",
   "engines": {
@@ -16,6 +25,35 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
-    "marked": "^15.0.12"
+    "@playwright/test": "^1.58.2",
+    "@supabase/supabase-js": "^2.99.3",
+    "@tanstack/react-query": "^5.95.0",
+    "chart.js": "^4.5.1",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-zoom": "^2.2.0",
+    "express": "^4.22.1",
+    "isomorphic-dompurify": "^3.6.0",
+    "marked": "^15.0.12",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^6.30.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/express": "^4.17.25",
+    "@types/node": "^24.10.13",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.27.4",
+    "jsdom": "^29.0.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^4.1.0"
   }
 }

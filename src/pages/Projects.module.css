@@ -1,0 +1,97 @@
+.filterButton {
+  border: 1px solid rgba(200, 200, 220, 0.4);
+  border-radius: 3px;
+  background: none;
+  padding: 0.3rem 0.8rem;
+  color: #888;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.filterButton:hover {
+  color: #374151;
+  border-color: rgba(150, 150, 170, 0.5);
+}
+
+.filterButtonActive {
+  border-color: rgba(100, 100, 120, 0.5);
+  background: rgba(156, 163, 175, 0.08);
+  color: #111827;
+  font-weight: 600;
+}
+
+.projectEntry {
+  border-bottom: 1px solid rgba(200, 200, 220, 0.2);
+  padding: 0.6rem 0;
+  color: #444;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.projectEntry:last-child {
+  border-bottom: none;
+}
+
+.filteredOut {
+  display: none;
+}
+
+.projectDate {
+  margin-right: 0.5rem;
+  color: #999;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.projectDesc {
+  color: #444;
+}
+
+.projectLink {
+  position: relative;
+  display: inline;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1.5px solid rgba(100, 100, 100, 0.4);
+  font-weight: 500;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.projectLink:hover {
+  color: #000;
+  border-bottom-color: #333;
+}
+
+.hoverTrigger {
+  cursor: pointer;
+  border-radius: 2px;
+  background: linear-gradient(to top, rgba(200, 180, 255, 0.25) 0%, rgba(200, 180, 255, 0.25) 40%, transparent 40%);
+  padding: 0 2px;
+  color: #333;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hoverTrigger:hover {
+  background: linear-gradient(to top, rgba(160, 130, 230, 0.35) 0%, rgba(160, 130, 230, 0.35) 40%, transparent 40%);
+  color: #111;
+}
+
+.hoverTriggerPlain {
+  cursor: pointer;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .projectsSectionContent {
+    margin-top: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .projectEntry {
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+}

@@ -17,7 +17,7 @@ He brings them to life in such a way that it grabs the attention of people and, 
 He did that for me and many more with his History of Architecture:
 
 <video width="50%" controls>
-  <source src="../assets/fabdream.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/fabdream.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -28,7 +28,7 @@ I'm extremely interested in audio-visual poetry as a medium and Arlo was one of 
 I don't know what this means, but he told me that he doesn't know what it means either:
 
 <video width="50%" controls>
-  <source src="../assets/arlo.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/arlo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -42,7 +42,7 @@ During most of my time making Dough, I was constantly thinking of Hannah and how
 Seeing her make something so distinctly her made me feel like I had spent my time well.
 
 <video width="50%" controls>
-  <source src="../assets/hannah.mov" type="video/quicktime">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/hannah.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -52,7 +52,7 @@ Seeing her make something so distinctly her made me feel like I had spent my tim
 A good music video pulls you not into a song but helps etch it in your brain. Coming up to Halloween, I find myself thinking of this song and video frequently thanks to Teslanaut:
 
 <video width="50%" controls>
-  <source src="../assets/teslanaut.mov" type="video/quicktime">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/teslanaut.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -67,7 +67,7 @@ Making it involved so much suffering and sleep deprivation that I couldn't edit 
 Then, when I came back to edit it, I watched it through and it hit me with the feeling I intended it to give: nostalgia for a life that you've never experienced. It was another one of those things that made me feel like I'm not wasting my life.
 
 <video width="50%" controls>
-  <source src="../assets/pom_compressed.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/pom_compressed.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 

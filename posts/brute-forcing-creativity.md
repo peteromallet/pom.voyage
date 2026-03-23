@@ -47,7 +47,7 @@ So consider this my attempt to brute-force bootstrapping creative expression. An
 I mean, you are reading this...right? And now you're expecting me to create stuff...right?
 
 <video width="100%" controls>
-  <source src="../assets/0.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/0.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 <em>A 'failed' gen</em>

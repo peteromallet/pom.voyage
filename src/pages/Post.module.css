@@ -1,0 +1,262 @@
+.postHeader {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+  text-align: center;
+}
+
+.postTitle {
+  margin-bottom: 1rem;
+  color: var(--color-text-strong);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.postDate {
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.postContent {
+  color: #1f2937;
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.postContent :global(h1),
+.postContent :global(h2),
+.postContent :global(h3),
+.postContent :global(h4),
+.postContent :global(h5),
+.postContent :global(h6) {
+  margin: 2rem 0 1rem;
+  color: var(--color-text-strong);
+  font-weight: 600;
+}
+
+.postContent :global(h1) {
+  font-size: 2rem;
+}
+
+.postContent :global(h2) {
+  font-size: 1.75rem;
+}
+
+.postContent :global(h3) {
+  font-size: 1.5rem;
+}
+
+.postContent :global(h4) {
+  font-size: 1.25rem;
+}
+
+.postContent :global(p) {
+  margin: 1.5rem 0;
+  color: #374151;
+}
+
+.postContent :global(code) {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background: rgba(156, 163, 175, 0.2);
+  color: #dc2626;
+  font-size: 0.9em;
+  font-family: var(--font-body);
+}
+
+.postContent :global(pre) {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  border-radius: 0.5rem;
+  background: rgba(156, 163, 175, 0.1);
+  padding: 1.5rem;
+}
+
+.postContent :global(pre code) {
+  padding: 0;
+  background: none;
+  color: #374151;
+}
+
+.postContent :global(ul),
+.postContent :global(ol) {
+  margin: 1.5rem 0;
+  padding-left: 2rem;
+}
+
+.postContent :global(li) {
+  margin: 0.5rem 0;
+  color: #374151;
+}
+
+.postContent :global(blockquote) {
+  margin: 1.5rem 0;
+  border-left: 4px solid #6b7280;
+  padding-left: 1.5rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.postContent :global(a) {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.postContent :global(a:hover) {
+  text-decoration: underline;
+}
+
+.postContent :global(video),
+.postContent :global(iframe) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1rem 0;
+  border-radius: 6px;
+}
+
+.postContent :global(iframe) {
+  min-height: 300px;
+}
+
+.postNavigation {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin: 2.5rem 0 3rem;
+  padding: 2rem 0;
+}
+
+.postNavigation::before {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  width: 300px;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.3);
+  transform: translateX(-50%);
+}
+
+.postNavigation:has(.navPrev):has(.navNext)::after {
+  content: '|';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: rgba(0, 0, 0, 0.3);
+  font-size: 1.5rem;
+  font-weight: 300;
+  transform: translate(-50%, -50%);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  max-width: 45%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.5rem;
+  color: #333;
+  text-decoration: none;
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.navLink:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navPrev {
+  justify-content: flex-start;
+}
+
+.navNext {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.navArrow {
+  font-size: 1.2rem;
+  font-weight: 700;
+  opacity: 0.7;
+  transition: opacity 0.25s ease;
+}
+
+.navLink:hover .navArrow {
+  opacity: 1;
+}
+
+.navTitle {
+  display: -webkit-box;
+  overflow: hidden;
+  line-height: 1.3;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.navSpacer {
+  width: 45%;
+  min-height: 3rem;
+}
+
+@media (max-width: 768px) {
+  .postArticle {
+    padding: 0 0.5rem;
+  }
+
+  .postTitle {
+    font-size: 2rem;
+  }
+
+  .postContent {
+    font-size: 1rem;
+  }
+
+  .postContent :global(h1) {
+    font-size: 1.75rem;
+  }
+
+  .postContent :global(h2) {
+    font-size: 1.5rem;
+  }
+
+  .postContent :global(h3) {
+    font-size: 1.25rem;
+  }
+
+  .postNavigation {
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .navLink {
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .navPrev,
+  .navNext {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .navSpacer {
+    display: none;
+  }
+}

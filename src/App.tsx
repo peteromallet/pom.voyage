@@ -1,0 +1,98 @@
+import { Route, Routes } from 'react-router-dom';
+import { SiteFrame } from './components/SiteFrame';
+import type { InitialData } from './types';
+import { HomePage } from './pages/Home';
+import { NotFoundPage } from './pages/NotFound';
+import { PostPage } from './pages/Post';
+import { PostsPage } from './pages/Posts';
+import { AccountabilityPage } from './pages/Accountability';
+import { AssortedPage } from './pages/Assorted';
+import { CryptoConversationPage } from './pages/CryptoConversation';
+import { CryptoConversationsPage } from './pages/CryptoConversations';
+import { MuteListPage } from './pages/MuteList';
+import { ProjectsPage } from './pages/Projects';
+
+interface AppProps {
+  initialData: InitialData;
+}
+
+export function App({ initialData }: AppProps) {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <SiteFrame showFooter>
+            <HomePage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/posts"
+        element={
+          <SiteFrame showFooter>
+            <PostsPage posts={initialData.page === 'posts' ? initialData.posts : undefined} />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/posts/:slug"
+        element={
+          <SiteFrame>
+            <PostPage data={initialData.page === 'post' ? initialData.postPage : undefined} />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted"
+        element={
+          <SiteFrame showFooter>
+            <AssortedPage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/accountability"
+        element={
+          <SiteFrame showFooter>
+            <AccountabilityPage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/projects"
+        element={
+          <SiteFrame showFooter>
+            <ProjectsPage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/crypto-conversations"
+        element={
+          <SiteFrame showFooter>
+            <CryptoConversationsPage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/crypto-conversations/:id"
+        element={
+          <SiteFrame showFooter>
+            <CryptoConversationPage conversationId={initialData.page === 'crypto-conversation' ? initialData.conversationId : undefined} />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/mute-list"
+        element={
+          <SiteFrame showFooter>
+            <MuteListPage />
+          </SiteFrame>
+        }
+      />
+      <Route path="/404" element={<NotFoundPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}

@@ -9,7 +9,7 @@ A few months ago, I shared a workflow for travelling between images in the #wan_
 It wasn't much, I just made it easier to follow best practices with VACE masking and shared an example of it implemented:
 
 <video width="100%" controls>
-  <source src="../assets/Untitled_1280_x_512_px_3.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/Untitled_1280_x_512_px_3.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -24,20 +24,20 @@ In short, ClownsharkBatwing has been building RES4LYF - the most insane ComfyUI 
 AbleJones spent a lot of time understanding this, testing every sampler that Clownshark offers, and presenting the results and workflow nicely for others to learn from:
 
 <video width="100%" controls>
-  <source src="../assets/rapidsave.com_very_useful_comparison_between_119_res4lyf-q2b73w7pflqf1.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/rapidsave.com_very_useful_comparison_between_119_res4lyf-q2b73w7pflqf1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 This inspired and empowered TheShadow to keep investigating, who in turn figured out how to optimise the settings even further:
 
 <video width="100%" controls>
-  <source src="../assets/VaceCont_Final_00001_2.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/VaceCont_Final_00001_2.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 This included using [Banostasis](https://huggingface.co/Cseti/wan2.2-14B-Kinestasis_concept-lora-v1) - a LoRA that Cseti trained on stop-motion-like videos in a novel way to increase the amount of motion:
 
-<img src="../assets/lora1-low-notitle_00021.webp" width="100%" alt="Animation showing results">
+<img src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/lora1-low-notitle_00021.webp" width="100%" alt="Animation showing results">
 
 
 As a product of their collected work, with just 4 sampling steps, they've collectively overcome a common issue with distilling Wan 2.2 to run faster on consumer hardware: the slow motion effect. They've also kept CFG high enough that it's still promptable, solving another common issue with distillation.
@@ -45,12 +45,12 @@ As a product of their collected work, with just 4 sampling steps, they've collec
 Some of what TheShadow has shared has been beautiful:
 
 <video width="100%" controls>
-  <source src="../assets/Wan22_I2V_ClownShark__00011.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/Wan22_I2V_ClownShark__00011.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 <video width="100%" controls>
-  <source src="../assets/Wan22_I2V_ClownShark__00012.mp4" type="video/mp4">
+  <source src="https://ddbobialzdjkzainyqgb.supabase.co/storage/v1/object/public/assets/Wan22_I2V_ClownShark__00012.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
