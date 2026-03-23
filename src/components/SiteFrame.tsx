@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { BorderPomLetters } from './PomLetters';
 import { useBorderVisibility } from '../hooks/useBorderVisibility';
 import { useFooterVisibility } from '../hooks/useFooterVisibility';
-import './SiteFrame.module.css';
+import _siteFrameStyles from './SiteFrame.module.css';
+void _siteFrameStyles; // Ensure CSS module is included in production bundle
 
 interface SiteFrameProps {
   children: ReactNode;

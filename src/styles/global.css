@@ -226,3 +226,44 @@ button {
     padding: 0 0.5rem;
   }
 }
+
+/* Footer — in global.css so it's available on first paint */
+.github-suggestion-footer {
+  position: fixed;
+  right: 0;
+  bottom: 8px;
+  left: 0;
+  z-index: 1001;
+  padding: 5px 0;
+  color: #aaa;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.github-suggestion-footer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.github-suggestion-text {
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: rgba(251, 248, 239, 0.8);
+  font-size: 11px;
+}
+
+.github-suggestion-footer a {
+  position: relative;
+  padding-bottom: 1px;
+  color: #aaa;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .github-suggestion-footer {
+    display: none;
+  }
+}
