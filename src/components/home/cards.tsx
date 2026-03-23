@@ -22,10 +22,7 @@ function ParagraphList({ paragraphs }: { paragraphs: string[] }) {
   return (
     <div className={styles.textContent}>
       {paragraphs.map((paragraph) => (
-        <Fragment key={paragraph}>
-          <p>{paragraph}</p>
-          {paragraph !== paragraphs[paragraphs.length - 1] ? <br /> : null}
-        </Fragment>
+        <p key={paragraph}>{paragraph}</p>
       ))}
     </div>
   );
