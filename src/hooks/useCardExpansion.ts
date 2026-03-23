@@ -54,8 +54,14 @@ export function useCardExpansion() {
       const nextCard = hit?.closest<HTMLElement>('[data-card-id]');
       const nextCardId = nextCard?.dataset.cardId;
 
-      if (nextCardId && nextCardId !== expandedCardId) {
-        shellRectsRef.current.set(nextCardId, nextCard.getBoundingClientRect());
+      if (nextCardId === expandedCardId) {
+        // Still over the expanded card (which grew beyond its original rect)
+        shellRectsRef.current.set(expandedCardId, nextCard!.getBoundingClientRect());
+        return;
+      }
+
+      if (nextCardId) {
+        shellRectsRef.current.set(nextCardId, nextCard!.getBoundingClientRect());
         setExpandedCardId(nextCardId);
         return;
       }
