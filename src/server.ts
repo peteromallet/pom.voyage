@@ -172,15 +172,27 @@ async function createApp() {
         }
       } else {
         render = (await import(path.resolve(root, 'dist/server/entry-server.js'))).render;
-        // Inject CSS link from Vite manifest to prevent FOUC
+        // Rewrite dev paths to production bundle paths from Vite manifest
         try {
           const manifestPath = path.resolve(root, 'dist/client/.vite/manifest.json');
           const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
           const entry = manifest['src/entry-client.tsx'];
           if (entry?.css) {
-            headTags = entry.css.map((f: string) => `<link rel="stylesheet" href="/assets/${f.replace(/^assets\//, '')}">`).join('\n');
+            headTags = entry.css.map((f: string) => `<link rel="stylesheet" href="/${f}">`).join('\n');
           }
-        } catch { /* manifest read failed — CSS will load via JS */ }
+          if (entry?.file) {
+            // Replace dev script with production bundle
+            template = template.replace(
+              '<script type="module" src="/src/entry-client.tsx"></script>',
+              `<script type="module" src="/${entry.file}"></script>`,
+            );
+          }
+          // Remove dev-only global.css link (it's bundled into the CSS file in prod)
+          template = template.replace(
+            '<link rel="stylesheet" href="/src/styles/global.css" />',
+            '',
+          );
+        } catch { /* manifest read failed */ }
       }
 
       const { html } = render(req.originalUrl, data);
