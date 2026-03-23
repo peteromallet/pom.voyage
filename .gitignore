@@ -21,3 +21,9 @@ Thumbs.db
 # Project specific
 2ndRenaissance.html
 migration-baselines/
+localhost-*.log
+css-audit.md
+scorecard.png
+assets/compressed/
+.desloppify/
+.megaplan/
