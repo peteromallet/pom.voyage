@@ -49,7 +49,8 @@ function safeJson(value: unknown) {
 }
 
 async function createApp() {
-  const isProd = process.env.NODE_ENV === 'production';
+  const distExists = await fs.access(path.resolve(root, 'dist/client/index.html')).then(() => true, () => false);
+  const isProd = process.env.NODE_ENV === 'production' || distExists;
   const port = Number(process.env.PORT || 3002);
   const host = '0.0.0.0';
   const app = express();
