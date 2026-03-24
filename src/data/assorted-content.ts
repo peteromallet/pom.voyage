@@ -288,6 +288,15 @@ export const MUTE_LIST_NOTE =
 
 export const PROJECTS: ProjectEntry[] = [
   {
+    date: 'Mar 2026-now',
+    ongoing: true,
+    parts: [
+      'AI plans are often sloppy and incomplete. I built ',
+      { type: 'link', label: 'megaplan', href: 'https://github.com/peteromallet/megaplan', className: 'project-link' },
+      ' — a structured planning loop that enforces sequencing, critique, and audit artifacts. Plans get reviewed by a separate AI critic before execution.',
+    ],
+  },
+  {
     date: 'Feb 2026-now',
     ongoing: true,
     parts: [
