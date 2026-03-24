@@ -107,8 +107,8 @@ button {
 .section-toggle {
   position: relative;
   z-index: 2;
-  background: rgba(251, 248, 239, 0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(251, 248, 239, 0.45);
+  backdrop-filter: blur(3px);
   border-radius: 0.5rem;
   padding: 0.25rem;
   display: inline-flex;
