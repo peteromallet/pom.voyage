@@ -149,10 +149,10 @@ export function MemeCard({
       </div>
       <h3>{card.title}</h3>
       <div className="card-text-content">
+        <p>Here is a small collection of memes that I think about a lot.</p>
         <p>
-          Here is a small collection of memes that I think about a lot. If you find any memes you
-          think I&apos;ll enjoy, please send them to me via{' '}
-          <a href="mailto:peter@omalley.io">email</a>.
+          If you find any memes you think I&apos;ll enjoy, please send them to me via{' '}
+          <a href="mailto:peter@omalley.io">electronic mail</a>.
         </p>
       </div>
       <div className="meme-hover-container">
