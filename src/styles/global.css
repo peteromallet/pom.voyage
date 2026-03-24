@@ -2662,24 +2662,17 @@ button {
 }
 
 .card-link-row {
-  height: 0;
-  margin: 0;
-  overflow: hidden;
-  opacity: 0;
+  display: inline-block;
+  width: fit-content;
+  margin-top: 0.5rem;
+  opacity: 0.35;
   pointer-events: none;
-  transform: translateY(10px);
-  transition: height 0.2s ease, opacity 0.2s ease, transform 0.2s ease, margin 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .card.expanded .card-link-row {
-  display: inline-block;
-  width: fit-content;
-  height: auto;
-  margin-top: 0.5rem;
-  overflow: visible;
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
 }
 
 .card-year-link {
