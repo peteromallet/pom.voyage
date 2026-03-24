@@ -239,9 +239,9 @@ export const HOME_CARDS: HomeCardData[] = [
       "Some examples: Megaplan for structured AI planning with enforced critique loops, VibeComfy for creative generation via ComfyUI, Desloppify for cleaning up and improving engineering quality, and Dataclaw for scraping and structuring data.",
     ],
     linkLinks: [
+      { label: 'Desloppify', href: 'https://github.com/peteromallet/desloppify' },
       { label: 'Megaplan', href: 'https://github.com/peteromallet/megaplan' },
       { label: 'VibeComfy', href: 'https://github.com/peteromallet/VibeComfy' },
-      { label: 'Desloppify', href: 'https://github.com/peteromallet/desloppify' },
       { label: 'Dataclaw', href: 'https://github.com/peteromallet/dataclaw' },
     ],
   },
