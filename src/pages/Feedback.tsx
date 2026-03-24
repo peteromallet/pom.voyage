@@ -140,13 +140,10 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
   const [formError, setFormError] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [anonymousMode, setAnonymousMode] = useState(false);
-  const [privateMode, setPrivateMode] = useState(false);
   const [anonText, setAnonText] = useState('');
   const [anonSubmitting, setAnonSubmitting] = useState(false);
   const [anonError, setAnonError] = useState<string | null>(null);
-  const [privateText, setPrivateText] = useState('');
-  const [privateSubmitting, setPrivateSubmitting] = useState(false);
-  const [privateError, setPrivateError] = useState<string | null>(null);
+  const [keepPrivate, setKeepPrivate] = useState(false);
   const [showSuspicious, setShowSuspicious] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -206,7 +203,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
       const response = await fetch('/api/feedback/anonymous', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedback_text: trimmed }),
+        body: JSON.stringify({ feedback_text: trimmed, is_private: keepPrivate }),
       });
 
       if (!response.ok) {
@@ -216,51 +213,14 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
 
       setAnonText('');
       setAnonymousMode(false);
+      setKeepPrivate(false);
       setSubmitSuccess(true);
       setTimeout(() => setSubmitSuccess(false), 4000);
-      await refreshFeedback();
+      if (!keepPrivate) await refreshFeedback();
     } catch (error) {
-      setAnonError(error instanceof Error ? error.message : 'Failed to submit anonymous feedback.');
+      setAnonError(error instanceof Error ? error.message : 'Failed to submit feedback.');
     } finally {
       setAnonSubmitting(false);
-    }
-  };
-
-  const handlePrivateSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = privateText.trim();
-    if (!trimmed) {
-      setPrivateError('Feedback cannot be empty.');
-      return;
-    }
-    if (trimmed.length > MAX_FEEDBACK_LENGTH) {
-      setPrivateError(`Feedback must be ${MAX_FEEDBACK_LENGTH} characters or fewer.`);
-      return;
-    }
-
-    setPrivateSubmitting(true);
-    setPrivateError(null);
-
-    try {
-      const response = await fetch('/api/feedback/private', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedback_text: trimmed }),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({ error: 'Submission failed.' }));
-        throw new Error(body.error ?? 'Submission failed.');
-      }
-
-      setPrivateText('');
-      setPrivateMode(false);
-      setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 4000);
-    } catch (error) {
-      setPrivateError(error instanceof Error ? error.message : 'Failed to submit private feedback.');
-    } finally {
-      setPrivateSubmitting(false);
     }
   };
 
@@ -328,6 +288,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
 
       const { error } = await supabase.from('feedback').insert({
         user_id: user.id,
+        is_private: keepPrivate,
         x_username: xProfile?.username ?? user.user_metadata?.user_name ?? null,
         x_user_id: xProfile?.x_user_id ?? user.user_metadata?.provider_id ?? user.user_metadata?.sub ?? null,
         x_avatar_url: xProfile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
@@ -341,19 +302,22 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
         throw error;
       }
 
-      // Fire-and-forget tweet notification
-      void fetch('/api/feedback/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          x_username: xProfile?.username ?? user.user_metadata?.user_name ?? null,
-          x_avatar_url: xProfile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
-          feedback_text: trimmedFeedback,
-        }),
-      }).catch(() => undefined);
+      // Fire-and-forget tweet notification (skip for private feedback)
+      if (!keepPrivate) {
+        void fetch('/api/feedback/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            x_username: xProfile?.username ?? user.user_metadata?.user_name ?? null,
+            x_avatar_url: xProfile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
+            feedback_text: trimmedFeedback,
+          }),
+        }).catch(() => undefined);
+      }
 
       setFeedbackText('');
       setSelectedFiles([]);
+      setKeepPrivate(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -393,7 +357,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
             <div className="mt-6 rounded-[18px] border border-[rgba(145,118,90,0.18)] bg-[rgba(255,255,255,0.74)] p-5">
               {loading ? (
                 <p className="text-[0.82rem] text-[#7c6a5b]">Checking your X session...</p>
-              ) : !user && !anonymousMode && !privateMode ? (
+              ) : !user && !anonymousMode ? (
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap gap-3">
                     <button
@@ -408,59 +372,14 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       onClick={() => setAnonymousMode(true)}
                       className="inline-flex w-fit items-center justify-center rounded-full border border-[rgba(145,118,90,0.24)] px-5 py-2.5 font-display text-[0.95rem] text-[#6a5a4d] transition hover:border-[rgba(145,118,90,0.42)] hover:text-[#2f2216]"
                     >
-                      Submit publicly &amp; anonymously
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPrivateMode(true)}
-                      className="inline-flex w-fit items-center justify-center rounded-full border border-[rgba(145,118,90,0.24)] px-5 py-2.5 font-display text-[0.95rem] text-[#6a5a4d] transition hover:border-[rgba(145,118,90,0.42)] hover:text-[#2f2216]"
-                    >
-                      Submit privately
+                      Submit anonymously
                     </button>
                   </div>
                   <p className="text-[0.8rem] leading-[1.7] text-[#7c6a5b]">
-                    Sign in to attach your identity, submit anonymously (still listed publicly), or submit privately (only I will see it).
+                    Sign in to attach your identity, or submit anonymously.
                   </p>
                   {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
                   {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
-                </div>
-              ) : !user && privateMode ? (
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <p className="font-display text-[1rem] text-[#2f2216]">Private feedback</p>
-                    <button
-                      type="button"
-                      onClick={() => { setPrivateMode(false); setPrivateError(null); }}
-                      className="text-[0.82rem] text-[#8b6a4f] underline underline-offset-4"
-                    >
-                      Back to options
-                    </button>
-                  </div>
-                  <p className="text-[0.8rem] leading-[1.7] text-[#7c6a5b]">
-                    This feedback will only be visible to me. It won&apos;t be posted publicly.
-                  </p>
-                  <form onSubmit={handlePrivateSubmit} className="flex flex-col gap-4">
-                    <textarea
-                      value={privateText}
-                      onChange={(event) => setPrivateText(event.target.value.slice(0, MAX_FEEDBACK_LENGTH))}
-                      maxLength={MAX_FEEDBACK_LENGTH}
-                      rows={6}
-                      placeholder="Your private feedback..."
-                      className="min-h-[160px] rounded-[16px] border border-[rgba(145,118,90,0.22)] bg-[rgba(255,253,249,0.95)] px-4 py-3 text-[0.92rem] leading-[1.7] text-[#2f2216] outline-none transition focus:border-[rgba(99,72,47,0.55)]"
-                    />
-                    <div className="flex items-center justify-between text-[0.75rem] text-[#7c6a5b]">
-                      <span>Only visible to the site owner.</span>
-                      <span>{privateText.length}/{MAX_FEEDBACK_LENGTH}</span>
-                    </div>
-                    {privateError ? <p className="text-[0.8rem] text-[#a93f34]">{privateError}</p> : null}
-                    <button
-                      type="submit"
-                      disabled={privateSubmitting}
-                      className="inline-flex w-fit items-center justify-center rounded-full bg-[#9c7a5d] px-5 py-2.5 font-display text-[0.95rem] text-[#fff8f0] transition hover:bg-[#7e5f46] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {privateSubmitting ? 'Submitting...' : 'Submit private feedback'}
-                    </button>
-                  </form>
                 </div>
               ) : !user && anonymousMode ? (
                 <div className="flex flex-col gap-4">
@@ -490,13 +409,22 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       <span>No images allowed for anonymous submissions.</span>
                       <span>{anonText.length}/{MAX_FEEDBACK_LENGTH}</span>
                     </div>
+                    <label className="flex cursor-pointer items-center gap-2 text-[0.82rem] text-[#6a5a4d]">
+                      <input
+                        type="checkbox"
+                        checked={keepPrivate}
+                        onChange={(e) => setKeepPrivate(e.target.checked)}
+                        className="accent-[#9c7a5d]"
+                      />
+                      Keep this private (only visible to the site owner)
+                    </label>
                     {anonError ? <p className="text-[0.8rem] text-[#a93f34]">{anonError}</p> : null}
                     <button
                       type="submit"
                       disabled={anonSubmitting}
                       className="inline-flex w-fit items-center justify-center rounded-full bg-[#9c7a5d] px-5 py-2.5 font-display text-[0.95rem] text-[#fff8f0] transition hover:bg-[#7e5f46] disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {anonSubmitting ? 'Submitting...' : 'Submit anonymous feedback'}
+                      {anonSubmitting ? 'Submitting...' : keepPrivate ? 'Submit privately' : 'Submit anonymous feedback'}
                     </button>
                   </form>
                 </div>
@@ -582,6 +510,16 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       </div>
                     ) : null}
 
+                    <label className="flex cursor-pointer items-center gap-2 text-[0.82rem] text-[#6a5a4d]">
+                      <input
+                        type="checkbox"
+                        checked={keepPrivate}
+                        onChange={(e) => setKeepPrivate(e.target.checked)}
+                        className="accent-[#9c7a5d]"
+                      />
+                      Keep this private (only visible to the site owner)
+                    </label>
+
                     {formError ? <p className="text-[0.8rem] text-[#a93f34]">{formError}</p> : null}
                     {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
                     {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
@@ -591,7 +529,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       disabled={submitting}
                       className="inline-flex w-fit items-center justify-center rounded-full bg-[#9c7a5d] px-5 py-2.5 font-display text-[0.95rem] text-[#fff8f0] transition hover:bg-[#7e5f46] disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {submitting ? 'Submitting...' : 'Submit feedback'}
+                      {submitting ? 'Submitting...' : keepPrivate ? 'Submit privately' : 'Submit feedback'}
                     </button>
                   </form>
                 </div>

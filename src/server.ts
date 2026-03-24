@@ -66,6 +66,7 @@ async function createApp() {
 
   app.post('/api/feedback/anonymous', async (req, res) => {
     const feedbackText = typeof req.body?.feedback_text === 'string' ? req.body.feedback_text.trim() : '';
+    const isPrivate = req.body?.is_private === true;
 
     if (!feedbackText) {
       res.status(400).json({ error: 'Feedback text is required.' });
@@ -83,6 +84,7 @@ async function createApp() {
         headers: { Prefer: 'return=minimal' },
         body: JSON.stringify({
           is_anonymous: true,
+          is_private: isPrivate,
           x_username: null,
           x_user_id: null,
           x_avatar_url: null,
@@ -94,49 +96,16 @@ async function createApp() {
 
       res.json({ success: true });
 
-      // Fire-and-forget tweet (anonymous is always suspicious, but still tweet it)
-      void tweetFeedbackLink({ username: null, isAnonymous: true, feedbackText });
+      // Fire-and-forget tweet (skip for private feedback)
+      if (!isPrivate) {
+        void tweetFeedbackLink({ username: null, isAnonymous: true, feedbackText });
+      }
     } catch (error) {
       console.warn('Anonymous feedback insert failed:', error);
       res.status(500).json({ error: 'Failed to submit anonymous feedback.' });
     }
   });
 
-  app.post('/api/feedback/private', async (req, res) => {
-    const feedbackText = typeof req.body?.feedback_text === 'string' ? req.body.feedback_text.trim() : '';
-
-    if (!feedbackText) {
-      res.status(400).json({ error: 'Feedback text is required.' });
-      return;
-    }
-
-    if (feedbackText.length > 1000) {
-      res.status(400).json({ error: 'Feedback must be 1000 characters or fewer.' });
-      return;
-    }
-
-    try {
-      await supabaseServiceRequest('feedback', {
-        method: 'POST',
-        headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify({
-          is_anonymous: true,
-          is_private: true,
-          x_username: null,
-          x_user_id: null,
-          x_avatar_url: null,
-          x_followers_count: null,
-          feedback_text: feedbackText,
-          image_paths: '{}',
-        }),
-      });
-
-      res.json({ success: true });
-    } catch (error) {
-      console.warn('Private feedback insert failed:', error);
-      res.status(500).json({ error: 'Failed to submit private feedback.' });
-    }
-  });
 
   app.post('/api/feedback/notify', async (req, res) => {
     const username = typeof req.body?.x_username === 'string' ? req.body.x_username : null;
