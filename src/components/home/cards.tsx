@@ -148,7 +148,13 @@ export function MemeCard({
         <img src={card.imageSrc} alt={card.imageAlt} className="card-main-image" />
       </div>
       <h3>{card.title}</h3>
-      <ParagraphList paragraphs={card.body} />
+      <div className="card-text-content">
+        <p>
+          Here is a small collection of memes that I think about a lot. If you find any memes you
+          think I&apos;ll enjoy, please send them to me via{' '}
+          <a href="mailto:peter@omalley.io">email</a>.
+        </p>
+      </div>
       <div className="meme-hover-container">
         {card.memeImages.map((image, index) => (
           <div

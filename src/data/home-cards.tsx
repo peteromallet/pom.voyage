@@ -277,7 +277,7 @@ export const HOME_CARDS: HomeCardData[] = [
     cardClassName: 'card life-tile meme-card loading-element',
     imageSrc: asset('meme-placeholder.png'),
     imageAlt: 'Meme placeholder',
-    body: ['Here is a small collection of memes that I think about a lot. I\'ll add more as I find them.'],
+    body: [],
     memeImages: [
       { src: asset('meme-princess-mononoke.png'), alt: 'Princess Mononoke meme' },
       { src: asset('meme-kanye.jpg'), alt: 'Kanye' },
