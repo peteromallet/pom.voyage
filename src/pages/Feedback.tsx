@@ -350,7 +350,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                 Share public feedback or criticism for POM. Attach receipts.
               </h1>
               <p className="mt-3 text-[0.88rem] leading-[1.8] text-[#6a5a4d]">
-                In the spirit of openness, anyone can share open feedback or criticism that will live forever here. Anonymous or suspicious entries — accounts newer than one year or with fewer than 500 followers — will be flagged as potentially suspicious but still listed.
+                In the spirit of openness, anyone can share open feedback or criticism that will live forever here. Anonymous or questionable entries — accounts newer than one year or with fewer than 500 followers — will be flagged as potentially questionable but still listed.
               </p>
             </div>
 
@@ -450,7 +450,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                         <p className="text-[0.78rem] text-[#7c6a5b]">
                           {xProfile?.followers_count !== null && xProfile?.followers_count !== undefined
                             ? `${xProfile.followers_count.toLocaleString()} followers`
-                            : 'Follower count unavailable. New feedback will be flagged suspicious.'}
+                            : 'Follower count unavailable. New feedback will be flagged questionable.'}
                         </p>
                       </div>
                     </div>
@@ -546,7 +546,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                   onChange={(e) => setShowSuspicious(e.target.checked)}
                   className="accent-[#9c7a5d]"
                 />
-                Show {feedbackEntries.filter((e) => isSuspicious(e)).length} suspicious {feedbackEntries.filter((e) => isSuspicious(e)).length === 1 ? 'entry' : 'entries'}
+                Show {feedbackEntries.filter((e) => isSuspicious(e)).length} questionable {feedbackEntries.filter((e) => isSuspicious(e)).length === 1 ? 'entry' : 'entries'}
               </label>
             ) : null}
             {feedbackEntries.length === 0 ? (
