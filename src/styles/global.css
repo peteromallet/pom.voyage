@@ -2788,14 +2788,6 @@ button {
     max-height: 340px;
   }
 
-  .card-image-container {
-    padding-bottom: 35%;
-  }
-
-  .card:not(.expanded)::after {
-    height: 3em;
-  }
-
   .card.expanded {
     height: auto;
     max-height: none;
