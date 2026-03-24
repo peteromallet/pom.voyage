@@ -2527,8 +2527,8 @@ button {
   right: 0;
   bottom: 0;
   left: 0;
-  height: 5em;
-  background: linear-gradient(to top, rgba(255, 255, 255, 1) 12%, rgba(255, 255, 255, 0) 100%);
+  height: 40%;
+  background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
   pointer-events: none;
 }
 
