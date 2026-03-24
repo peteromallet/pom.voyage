@@ -1,6 +1,6 @@
 import { asset } from '../lib/assets';
 
-export type HomeFilter = 'all' | 'initiatives' | 'art' | 'tech' | 'posts' | 'lore';
+export type HomeFilter = 'all' | 'initiatives' | 'art' | 'tools' | 'posts' | 'lore';
 
 export interface SquareImageData {
   alt: string;
@@ -86,7 +86,7 @@ export const HOME_FILTERS: Array<{ key: HomeFilter; label: string }> = [
   { key: 'all', label: 'All' },
   { key: 'initiatives', label: 'Initiatives' },
   { key: 'art', label: 'Art' },
-  { key: 'tech', label: 'Tech' },
+  { key: 'tools', label: 'Tools' },
   { key: 'posts', label: 'Posts' },
   { key: 'lore', label: 'Lore' },
 ];
@@ -190,7 +190,7 @@ export const HOME_CARDS: HomeCardData[] = [
     kind: 'project',
     title: 'Steerable Motion',
     position: 3,
-    category: 'tech',
+    category: 'tools',
     cardClassName: 'card project-tile loading-element',
     imageSrc: asset('steerable-motion-visual.png'),
     imageAlt: 'Steerable Motion visual',
@@ -230,7 +230,7 @@ export const HOME_CARDS: HomeCardData[] = [
     kind: 'story',
     title: 'Tools for agents',
     position: 6,
-    category: 'tech initiatives',
+    category: 'tools initiatives',
     cardClassName: 'card story-tile loading-element',
     imageSrc: asset('tools-for-agents.jpeg'),
     imageAlt: 'Tools for agents',
