@@ -18,13 +18,7 @@ interface CardTileProps {
 }
 
 function ParagraphList({ paragraphs }: { paragraphs: string[] }) {
-  return (
-    <div className="card-text-content">
-      {paragraphs.map((paragraph) => (
-        <p key={paragraph}>{paragraph}</p>
-      ))}
-    </div>
-  );
+  return paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>);
 }
 
 function LinkRow({
@@ -57,15 +51,17 @@ export function StoryCard({ card }: { card: StoryCardData }) {
         <img src={card.imageSrc} alt={card.imageAlt} />
       </div>
       <h3>{card.title}</h3>
-      <ParagraphList paragraphs={card.paragraphs} />
-      {card.linkLabel && card.linkHref ? (
-        <div className="card-link-row">
-          <a href={card.linkHref} target="_blank" rel="noreferrer" className="card-year-link">
-            {card.linkLabel}
-          </a>
-        </div>
-      ) : null}
-      {card.linkLinks ? <LinkRow links={card.linkLinks} /> : null}
+      <div className="card-text-content">
+        <ParagraphList paragraphs={card.paragraphs} />
+        {card.linkLabel && card.linkHref ? (
+          <div className="card-link-row">
+            <a href={card.linkHref} target="_blank" rel="noreferrer" className="card-year-link">
+              {card.linkLabel}
+            </a>
+          </div>
+        ) : null}
+        {card.linkLinks ? <LinkRow links={card.linkLinks} /> : null}
+      </div>
     </>
   );
 }
@@ -93,13 +89,13 @@ export function ProjectCard({ card }: { card: ProjectCardData }) {
       <h3>{card.title}</h3>
       <div className="card-text-content">
         <p>{card.body.map((part, index) => renderProjectBodyPart(part, index))}</p>
-      </div>
-      <div className="card-link-row">
-        <span>
-          <a href={card.linkHref} target="_blank" rel="noreferrer" className="card-year-link">
-            {card.linkLabel}
-          </a>
-        </span>
+        <div className="card-link-row">
+          <span>
+            <a href={card.linkHref} target="_blank" rel="noreferrer" className="card-year-link">
+              {card.linkLabel}
+            </a>
+          </span>
+        </div>
       </div>
     </>
   );
@@ -125,8 +121,10 @@ export function VideoCardTile({
         isMobile={isMobile}
       />
       <h3>{card.title}</h3>
-      <ParagraphList paragraphs={card.body} />
-      <LinkRow links={card.links} />
+      <div className="card-text-content">
+        <ParagraphList paragraphs={card.body} />
+        <LinkRow links={card.links} />
+      </div>
     </>
   );
 }

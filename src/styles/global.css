@@ -2662,10 +2662,6 @@ button {
 }
 
 .card-link-row {
-  position: absolute;
-  bottom: 1rem;
-  left: 1.5rem;
-  z-index: 5;
   display: inline-block;
   width: fit-content;
   opacity: 0.35;
@@ -2674,9 +2670,6 @@ button {
 }
 
 .card.expanded .card-link-row {
-  position: relative;
-  bottom: auto;
-  left: auto;
   margin-top: 0.5rem;
   opacity: 1;
   pointer-events: auto;
