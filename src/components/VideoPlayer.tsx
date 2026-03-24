@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Icon } from './icons';
-import styles from './VideoPlayer.module.css';
 
 interface VideoPlayerProps {
   className?: string;
@@ -35,7 +34,7 @@ export function VideoPlayer({
 
   return (
     <div
-      className={`${styles.videoContainer} ${className}`.trim()}
+      className={`video-container ${className}`.trim()}
       data-revealed={revealed ? 'true' : 'false'}
       onMouseLeave={() => {
         if (!isMobile) {
@@ -46,20 +45,20 @@ export function VideoPlayer({
       <img
         src={thumbnailSrc}
         alt={thumbnailAlt}
-        className={styles.thumbnail}
+        className="video-thumbnail"
       />
       <button
         type="button"
-        className={styles.overlay}
+        className="video-overlay"
         aria-label={`Play ${embedTitle}`}
         onClick={(event) => {
           event.stopPropagation();
           setRevealed(true);
         }}
       >
-        <Icon name="play-circle" className={styles.playIcon} />
+        <Icon name="play-circle" className="video-play-icon" />
       </button>
-      <div className={styles.embed}>
+      <div className="video-embed">
         {revealed ? (
           <iframe
             width="100%"

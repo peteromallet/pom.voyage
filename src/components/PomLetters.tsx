@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import styles from './PomLetters.module.css';
 
 const BORDER_REPETITIONS = 60;
 const BORDER_SEQUENCE = ['P', 'O', 'M'] as const;
@@ -84,7 +83,7 @@ export function HeroPomLetters({ interactive = true, bare = false }: HeroPomLett
 
   return (
     <div
-      className={`${styles.hero} large-letters${allClicked ? ' active' : ''}`}
+      className={`pom-hero large-letters${allClicked ? ' active' : ''}`}
       id="pom-letters"
       onMouseLeave={() => {
         setHoveredIndex(null);

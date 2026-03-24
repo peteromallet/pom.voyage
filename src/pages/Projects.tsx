@@ -2,7 +2,6 @@ import { Fragment, useEffect, useState } from 'react';
 import { Header } from '../components/Header';
 import { HoverPopup } from '../components/HoverPopup';
 import { PROJECTS, type ProjectTextPart } from '../data/assorted-content';
-import styles from './Projects.module.css';
 
 export function ProjectsPage() {
   const [filter, setFilter] = useState<'all' | 'ongoing'>('all');
@@ -35,7 +34,7 @@ export function ProjectsPage() {
 
     if (part.type === 'link') {
       return (
-        <a key={`${part.href}-${index}`} href={part.href} target="_blank" rel="noreferrer" className={styles.projectLink}>
+        <a key={`${part.href}-${index}`} href={part.href} target="_blank" rel="noreferrer" className="project-link">
           {part.label}
         </a>
       );
@@ -44,7 +43,7 @@ export function ProjectsPage() {
     return (
       <span
         key={`${part.image}-${index}`}
-        className={part.plain ? styles.hoverTriggerPlain : styles.hoverTrigger}
+        className={part.plain ? 'hover-trigger-plain' : 'hover-trigger'}
         data-img={part.image}
         onMouseEnter={(event) => onHover(part.image, event.currentTarget)}
         onMouseMove={(event) => onHover(part.image, event.currentTarget)}
@@ -77,11 +76,11 @@ export function ProjectsPage() {
             <a href="/assorted">Assorted</a> / Projects
           </div>
         </div>
-        <div className={`mx-auto mt-8 max-w-[720px] px-4 ${styles.projectsSectionContent}`}>
+        <div className="projects-section-content mx-auto mt-8 max-w-[720px] px-4">
           <div className="mb-5 flex gap-2">
             <button
               type="button"
-              className={`${styles.filterButton}${filter === 'all' ? ` ${styles.filterButtonActive}` : ''}`}
+              className={`projects-filter-button${filter === 'all' ? ' projects-filter-button-active' : ''}`}
               data-filter="all"
               onClick={() => setFilter('all')}
             >
@@ -89,7 +88,7 @@ export function ProjectsPage() {
             </button>
             <button
               type="button"
-              className={`${styles.filterButton}${filter === 'ongoing' ? ` ${styles.filterButtonActive}` : ''}`}
+              className={`projects-filter-button${filter === 'ongoing' ? ' projects-filter-button-active' : ''}`}
               data-filter="ongoing"
               onClick={() => setFilter('ongoing')}
             >
@@ -102,11 +101,11 @@ export function ProjectsPage() {
               return (
                 <div
                   key={`${project.date}-${project.parts[0]}`}
-                  className={`${styles.projectEntry}${filteredOut ? ` ${styles.filteredOut}` : ''}`}
+                  className={`project-entry${filteredOut ? ' filtered-out' : ''}`}
                   data-ongoing={project.ongoing ? 'true' : undefined}
                 >
-                  <span className={styles.projectDate}>{project.date}</span>
-                  <span className={styles.projectDesc}>
+                  <span className="project-date">{project.date}</span>
+                  <span className="project-desc">
                     {project.parts.map((part, index) =>
                       renderProjectPart(part, index, (image, element) => {
                         setPopupImage(image);

@@ -4,7 +4,6 @@ import {
   ACCOUNTABILITY_INTRO,
 } from '../data/assorted-content';
 import { useDetailsFromHash } from '../hooks/useDetailsFromHash';
-import styles from './Accountability.module.css';
 
 export function AccountabilityPage() {
   useDetailsFromHash();
@@ -17,18 +16,18 @@ export function AccountabilityPage() {
           <div className="sorted-breadcrumb">
             <a href="/assorted">Assorted</a> / Accountability
           </div>
-          <div className={`mb-6 ${styles.intro}`}>
+          <div className="accountability-intro mb-6">
             <p>{ACCOUNTABILITY_INTRO}</p>
           </div>
           <div className="flex flex-col">
             {ACCOUNTABILITY_COMMITMENTS.map((commitment) => (
-              <details key={commitment.id} id={commitment.id} className={styles.entry}>
-                <summary className={styles.summary}>
-                  <span className={styles.title}>{commitment.title}</span>
-                  <span className={styles.status}>{commitment.status}</span>
+              <details key={commitment.id} id={commitment.id} className="accountability-entry">
+                <summary className="accountability-summary">
+                  <span className="accountability-title">{commitment.title}</span>
+                  <span className="accountability-status">{commitment.status}</span>
                   <button
                     type="button"
-                    className={styles.copyLink}
+                    className="accountability-copy-link"
                     title="Copy link"
                     onClick={async (event) => {
                       event.preventDefault();
@@ -46,18 +45,18 @@ export function AccountabilityPage() {
                     🔗
                   </button>
                 </summary>
-                <div className={styles.details}>
-                  <div className={styles.dates}>
+                <div className="accountability-details">
+                  <div className="accountability-dates">
                     <span>{commitment.dates}</span>
                   </div>
-                  <ul className={styles.bullets}>
+                  <ul className="accountability-bullets">
                     {commitment.bullets.map((bullet) => (
                       <li key={bullet.label}>
                         <strong>{bullet.label}:</strong> {bullet.text}
                       </li>
                     ))}
                   </ul>
-                  <div className={styles.onchain}>
+                  <div className="accountability-onchain">
                     {commitment.onchain.map((item) => (
                       <p key={item.label}>
                         <strong>{item.label}:</strong>{' '}
@@ -73,7 +72,7 @@ export function AccountabilityPage() {
                       </p>
                     ))}
                   </div>
-                  {commitment.note ? <p className={styles.note}>{commitment.note}</p> : null}
+                  {commitment.note ? <p className="accountability-note">{commitment.note}</p> : null}
                 </div>
               </details>
             ))}

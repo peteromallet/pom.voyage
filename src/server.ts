@@ -162,7 +162,7 @@ async function createApp() {
         function collectCss(mod: any, seen = new Set<string>()) {
           if (!mod?.id || seen.has(mod.id)) return;
           seen.add(mod.id);
-          if (mod.id.endsWith('.css') || mod.id.includes('.module.css')) {
+          if (mod.id.endsWith('.css')) {
             cssUrls.add(mod.url);
           }
           mod.importedModules?.forEach((dep: any) => collectCss(dep, seen));
@@ -170,7 +170,7 @@ async function createApp() {
         modules?.forEach((mod: any) => collectCss(mod));
         // Also collect from all loaded modules
         for (const [, mod] of vite.moduleGraph.idToModuleMap) {
-          if (mod.id && (mod.id.endsWith('.css') || mod.id.includes('.module.css'))) {
+          if (mod.id?.endsWith('.css')) {
             cssUrls.add(mod.url);
           }
         }

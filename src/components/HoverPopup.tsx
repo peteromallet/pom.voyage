@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './HoverPopup.module.css';
 
 interface HoverPopupProps {
   imageSrc: string | null;
@@ -31,10 +30,10 @@ export function HoverPopup({ imageSrc, anchorRect, cursor, visible }: HoverPopup
 
   return createPortal(
     <div
-      className={`${styles.popup}${visible ? ` ${styles.visible}` : ''}`}
+      className={`hover-popup${visible ? ' hover-popup-visible' : ''}`}
       style={'ontouchstart' in window ? mobilePosition : desktopPosition}
     >
-      <img src={imageSrc} alt="" className={styles.image} />
+      <img src={imageSrc} alt="" className="hover-popup-image" />
     </div>,
     document.body,
   );

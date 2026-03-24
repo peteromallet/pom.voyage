@@ -4,7 +4,6 @@ import {
   CRYPTO_CONVERSATIONS,
   CRYPTO_CONVERSATIONS_INTRO,
 } from '../data/assorted-content';
-import styles from './CryptoConversations.module.css';
 
 export function CryptoConversationsPage() {
   return (
@@ -22,11 +21,11 @@ export function CryptoConversationsPage() {
                 <Link
                   key={conversation.id}
                   to={`/assorted/crypto-conversations/${conversation.id}`}
-                  className={styles.conversationLink}
+                  className="conversation-link"
                 >
-                  <span className={styles.username}>{conversation.username}</span>
-                  <span className={styles.conversationTitle}>{conversation.title}</span>
-                  <span className={styles.conversationDate}>{conversation.date}</span>
+                  <span className="conversation-username">{conversation.username}</span>
+                  <span className="conversation-title">{conversation.title}</span>
+                  <span className="conversation-date">{conversation.date}</span>
                   <span className="dir-arrow">→</span>
                 </Link>
               ))}

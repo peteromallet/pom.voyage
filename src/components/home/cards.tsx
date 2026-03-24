@@ -1,5 +1,4 @@
 import { Fragment } from 'react';
-import styles from './Cards.module.css';
 import type {
   DataCardData,
   HomeCardData,
@@ -20,7 +19,7 @@ interface CardTileProps {
 
 function ParagraphList({ paragraphs }: { paragraphs: string[] }) {
   return (
-    <div className={styles.textContent}>
+    <div className="card-text-content">
       {paragraphs.map((paragraph) => (
         <p key={paragraph}>{paragraph}</p>
       ))}
@@ -34,11 +33,11 @@ function LinkRow({
   links: Array<{ label: string; href: string }>;
 }) {
   return (
-    <div className={styles.linkRow}>
+    <div className="card-link-row">
       <span>
         {links.map((link, index) => (
           <Fragment key={link.href}>
-            <a href={link.href} target="_blank" rel="noreferrer" className={styles.yearLink}>
+            <a href={link.href} target="_blank" rel="noreferrer" className="card-year-link">
               {link.label}
             </a>
             {index < links.length - 1 ? (
@@ -54,14 +53,14 @@ function LinkRow({
 export function StoryCard({ card }: { card: StoryCardData }) {
   return (
     <>
-      <div className={styles.imageContainer}>
+      <div className="card-image-container">
         <img src={card.imageSrc} alt={card.imageAlt} />
       </div>
       <h3>{card.title}</h3>
       <ParagraphList paragraphs={card.paragraphs} />
       {card.linkLabel && card.linkHref ? (
-        <div className={styles.linkRow}>
-          <a href={card.linkHref} target="_blank" rel="noreferrer" className={styles.yearLink}>
+        <div className="card-link-row">
+          <a href={card.linkHref} target="_blank" rel="noreferrer" className="card-year-link">
             {card.linkLabel}
           </a>
         </div>
@@ -83,21 +82,21 @@ function renderProjectBodyPart(part: string | JSXLink, index: number) {
 export function ProjectCard({ card }: { card: ProjectCardData }) {
   return (
     <>
-      <div className={styles.imageContainer}>
+      <div className="card-image-container">
         <img src={card.imageSrc} alt={card.imageAlt} />
         {card.hoverGifSrc ? (
-          <div className={styles.hoverGif}>
+          <div className="card-hover-gif">
             <img src={card.hoverGifSrc} alt={card.hoverGifAlt} className="ignore-load" />
           </div>
         ) : null}
       </div>
       <h3>{card.title}</h3>
-      <div className={styles.textContent}>
+      <div className="card-text-content">
         <p>{card.body.map((part, index) => renderProjectBodyPart(part, index))}</p>
       </div>
-      <div className={styles.linkRow}>
+      <div className="card-link-row">
         <span>
-          <a href={card.linkHref} target="_blank" rel="noreferrer" className={styles.yearLink}>
+          <a href={card.linkHref} target="_blank" rel="noreferrer" className="card-year-link">
             {card.linkLabel}
           </a>
         </span>
@@ -145,16 +144,16 @@ export function MemeCard({
 }) {
   return (
     <>
-      <div className={styles.imageContainer}>
-        <img src={card.imageSrc} alt={card.imageAlt} className={styles.mainImage} />
+      <div className="card-image-container">
+        <img src={card.imageSrc} alt={card.imageAlt} className="card-main-image" />
       </div>
       <h3>{card.title}</h3>
       <ParagraphList paragraphs={card.body} />
-      <div className={styles.memeHoverContainer}>
+      <div className="meme-hover-container">
         {card.memeImages.map((image, index) => (
           <div
             key={image.src}
-            className={styles.memeImage}
+            className="meme-image"
             style={expanded ? { transitionDelay: `${0.1 * (index + 1)}s` } : undefined}
           >
             <img src={image.src} alt={image.alt} />

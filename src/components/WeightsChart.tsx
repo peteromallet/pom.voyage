@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import styles from './WeightsChart.module.css';
 
 interface MeasurementRow {
   withings_timestamp: string;
@@ -247,15 +246,15 @@ export function WeightsChart() {
 
   return (
     <>
-      <div className={styles.chartFrame} id="weights-chart-container">
-        <div className={styles.chartShell}>
+      <div className="weights-chart-frame" id="weights-chart-container">
+        <div className="weights-chart-shell">
           {loading ? (
-            <div className={styles.chartLoading}>
-              <div className={styles.spinner}></div>
+            <div className="weights-chart-loading">
+              <div className="weights-chart-spinner"></div>
               <div>Loading weight data...</div>
             </div>
           ) : error ? (
-            <div className={styles.chartLoading}>
+            <div className="weights-chart-loading">
               <div>Failed to load weight data</div>
             </div>
           ) : (
@@ -264,22 +263,22 @@ export function WeightsChart() {
         </div>
       </div>
       {chartReady && (
-        <div className={styles.zoomControls}>
-          <button type="button" className={styles.zoomButton} onClick={() => zoomTo('week')}>
+        <div className="weights-chart-zoom-controls">
+          <button type="button" className="weights-chart-zoom-button" onClick={() => zoomTo('week')}>
             7d
           </button>
-          <button type="button" className={styles.zoomButton} onClick={() => zoomTo('quarter')}>
+          <button type="button" className="weights-chart-zoom-button" onClick={() => zoomTo('quarter')}>
             3m
           </button>
-          <button type="button" className={styles.zoomButton} onClick={() => zoomTo('all')}>
+          <button type="button" className="weights-chart-zoom-button" onClick={() => zoomTo('all')}>
             All
           </button>
         </div>
       )}
-      <h3 id="weights-title" className={styles.title}>
+      <h3 id="weights-title" className="weights-chart-title">
         {title}
       </h3>
-      <div className={styles.textBlock}>
+      <div className="weights-chart-text-block">
         <p>
           For reference, I am 190cm - meaning my BMI currently is{' '}
           {bmi ? bmi.toFixed(1) : '{calculate based on last measurement}'}. I&apos;m publishing my daily weight

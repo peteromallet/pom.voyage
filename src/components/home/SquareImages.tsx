@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SquareImageData } from '../../data/home-cards';
 import { useImageHover } from '../../hooks/useImageHover';
-import styles from './SquareImages.module.css';
 
 interface SquareImagesProps {
   images: SquareImageData[];
@@ -24,15 +23,15 @@ export function SquareImages({ images }: SquareImagesProps) {
   }, [images, playingIndex]);
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.grid}>
+    <div className="square-images-wrapper">
+      <div className="square-images-grid">
         {images.map((image, index) => {
           const isActive = activeIndex === index;
           const isPlaying = playingIndex === index;
           return (
             <div
               key={image.label}
-              className={`square-image-container loading-element has-video ${styles.squareImageContainer}${isActive ? ` ${styles.mobileActive}` : ''}`}
+              className={`square-image-container loading-element has-video${isActive ? ' square-image-mobile-active' : ''}`}
               onClick={() => onToggle(index)}
               onMouseEnter={() => onEnter(index)}
               onMouseLeave={() => onLeave()}
@@ -40,7 +39,7 @@ export function SquareImages({ images }: SquareImagesProps) {
               <img
                 src={image.imageSrc}
                 alt={image.alt}
-                className={styles.media}
+                className="square-image-media"
                 style={isPlaying ? { display: 'none' } : undefined}
                 onClick={() => {
                   const video = videoRefs.current[index];
@@ -58,7 +57,7 @@ export function SquareImages({ images }: SquareImagesProps) {
                 src={image.videoSrc}
                 preload={isMobile ? 'metadata' : 'auto'}
                 playsInline
-                className={styles.media}
+                className="square-image-media"
                 style={{ display: 'none' }}
                 onLoadedMetadata={(event) => {
                   event.currentTarget.currentTime = image.startTime;
@@ -68,7 +67,7 @@ export function SquareImages({ images }: SquareImagesProps) {
                   setPlayingIndex((current) => (current === index ? null : current));
                 }}
               />
-              <div className={styles.label}>{image.label}</div>
+              <div className="square-image-label">{image.label}</div>
             </div>
           );
         })}

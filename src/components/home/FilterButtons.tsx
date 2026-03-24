@@ -1,5 +1,4 @@
 import type { HomeFilter } from '../../data/home-cards';
-import styles from './FilterButtons.module.css';
 
 interface FilterButtonsProps {
   filters: Array<{ key: HomeFilter; label: string }>;
@@ -18,7 +17,7 @@ export function FilterButtons({ filters, isActive, onToggle }: FilterButtonsProp
           data-filter={filter.key}
           onClick={() => onToggle(filter.key)}
         >
-          {filter.label} <span className={styles.deselectIcon}>×</span>
+          {filter.label} <span className="deselect-icon">×</span>
         </button>
       ))}
     </div>

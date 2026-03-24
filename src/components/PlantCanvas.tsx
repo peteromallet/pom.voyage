@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import styles from './PlantCanvas.module.css';
 
 type Branch = {
   startX: number;
@@ -196,11 +195,11 @@ export function PlantCanvas() {
   };
 
   return (
-    <div className={styles.scene}>
+    <div className="plant-scene">
       <canvas id="plantCanvas" ref={canvasRef} suppressHydrationWarning></canvas>
       <div>
         <div
-          className={styles.wateringContainer}
+          className="watering-container"
           ref={wateringRef}
           role="button"
           tabIndex={0}
@@ -212,14 +211,14 @@ export function PlantCanvas() {
             }
           }}
         >
-          <div className={styles.wateringCan}>
-            <div className={styles.canBody}></div>
-            <div className={styles.spout}></div>
-            <div className={styles.handle}></div>
-            <div className={styles.waterDrops}>
-              <div className={styles.drop}></div>
-              <div className={styles.drop}></div>
-              <div className={styles.drop}></div>
+          <div className="watering-can">
+            <div className="watering-can-body"></div>
+            <div className="watering-can-spout"></div>
+            <div className="watering-can-handle"></div>
+            <div className="watering-can-water-drops">
+              <div className="watering-can-drop"></div>
+              <div className="watering-can-drop"></div>
+              <div className="watering-can-drop"></div>
             </div>
           </div>
         </div>
