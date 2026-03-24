@@ -416,7 +416,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                         onChange={(e) => setKeepPrivate(e.target.checked)}
                         className="accent-[#9c7a5d]"
                       />
-                      Keep this private (only visible to the site owner)
+                      Keep this private (only visible to POM)
                     </label>
                     {anonError ? <p className="text-[0.8rem] text-[#a93f34]">{anonError}</p> : null}
                     <button
@@ -517,7 +517,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                         onChange={(e) => setKeepPrivate(e.target.checked)}
                         className="accent-[#9c7a5d]"
                       />
-                      Keep this private (only visible to the site owner)
+                      Keep this private (only visible to POM)
                     </label>
 
                     {formError ? <p className="text-[0.8rem] text-[#a93f34]">{formError}</p> : null}
