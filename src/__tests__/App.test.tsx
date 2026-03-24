@@ -10,6 +10,10 @@ vi.mock('../lib/client-posts', () => ({
   getClientPostPage: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock('../pages/Feedback', () => ({
+  FeedbackPage: () => <div>Feedback Page Mock</div>,
+}));
+
 function renderApp(initialData: InitialData, route = '/') {
   return render(
     <MemoryRouter initialEntries={[route]}>
@@ -61,5 +65,10 @@ describe('App', () => {
     const { container } = renderApp({ page: 'assorted' }, '/assorted');
     // ASSORTED_INDEX_HTML contains the assorted section
     expect(container.querySelector('#sorted-section')).not.toBeNull();
+  });
+
+  it('renders the feedback page at "/assorted/feedback"', () => {
+    renderApp({ page: 'feedback', feedback: [] }, '/assorted/feedback');
+    expect(screen.getByText('Feedback Page Mock')).toBeInTheDocument();
   });
 });

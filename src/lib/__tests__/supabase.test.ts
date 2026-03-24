@@ -2,9 +2,15 @@ import {
   describe,
   it,
   expect,
-  afterEach
+  afterEach,
+  vi
 } from 'vitest';
-import { getPublicSupabaseConfig, hasPublicSupabaseConfig } from '../supabase';
+import {
+  getPublicSupabaseConfig,
+  getServiceRoleKey,
+  hasPublicSupabaseConfig,
+  supabaseServiceRequest,
+} from '../supabase';
 
 describe('getPublicSupabaseConfig', () => {
   const originalUrl = process.env.VITE_SUPABASE_URL;
@@ -93,5 +99,62 @@ describe('hasPublicSupabaseConfig', () => {
     process.env.VITE_SUPABASE_ANON_KEY = 'test-anon-key';
 
     expect(hasPublicSupabaseConfig()).toBe(false);
+  });
+});
+
+describe('getServiceRoleKey', () => {
+  const originalServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  afterEach(() => {
+    if (originalServiceRoleKey === undefined) {
+      delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    } else {
+      process.env.SUPABASE_SERVICE_ROLE_KEY = originalServiceRoleKey;
+    }
+  });
+
+  it('returns the service role key from the environment', () => {
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+    expect(getServiceRoleKey()).toBe('service-role-key');
+  });
+});
+
+describe('supabaseServiceRequest', () => {
+  const originalUrl = process.env.VITE_SUPABASE_URL;
+  const originalServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+
+    if (originalUrl === undefined) {
+      delete process.env.VITE_SUPABASE_URL;
+    } else {
+      process.env.VITE_SUPABASE_URL = originalUrl;
+    }
+
+    if (originalServiceRoleKey === undefined) {
+      delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    } else {
+      process.env.SUPABASE_SERVICE_ROLE_KEY = originalServiceRoleKey;
+    }
+  });
+
+  it('uses the service role key for apikey and Authorization headers', async () => {
+    process.env.VITE_SUPABASE_URL = 'https://example.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [],
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    await supabaseServiceRequest('feedback?select=id');
+
+    const [url, options] = mockFetch.mock.calls[0];
+    expect(url).toBe('https://example.supabase.co/rest/v1/feedback?select=id');
+    expect(options.headers.apikey).toBe('service-role-key');
+    expect(options.headers.Authorization).toBe('Bearer service-role-key');
   });
 });

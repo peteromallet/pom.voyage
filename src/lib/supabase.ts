@@ -4,6 +4,10 @@ function getEnvVar(name: string): string {
   return process.env[name] ?? '';
 }
 
+export function getServiceRoleKey(): string {
+  return getEnvVar('SUPABASE_SERVICE_ROLE_KEY');
+}
+
 export function getPublicSupabaseConfig(): AppConfig {
   return {
     supabaseUrl: getEnvVar('VITE_SUPABASE_URL'),
@@ -39,6 +43,39 @@ export async function supabaseRestRequest<T>(
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`Supabase request failed (${response.status}): ${body}`);
+  }
+
+  if (response.status === 204) {
+    return [] as unknown as T;
+  }
+
+  return (await response.json()) as T;
+}
+
+export async function supabaseServiceRequest<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
+  const { supabaseUrl } = getPublicSupabaseConfig();
+  const serviceRoleKey = getServiceRoleKey();
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase service role environment variables.');
+  }
+
+  const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      'Content-Type': 'application/json',
+      ...(init?.headers ?? {}),
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Supabase service request failed (${response.status}): ${body}`);
   }
 
   if (response.status === 204) {

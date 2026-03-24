@@ -12,6 +12,17 @@ describe('assorted data exports', () => {
     expect(ASSORTED_DIRECTORY_ITEMS.length).toBeGreaterThan(0);
   });
 
+  it('includes a live feedback directory entry', () => {
+    expect(ASSORTED_DIRECTORY_ITEMS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Feedback',
+          href: '/assorted/feedback',
+        }),
+      ]),
+    );
+  });
+
   it('defines accountability commitments', () => {
     expect(ACCOUNTABILITY_COMMITMENTS.length).toBeGreaterThan(0);
   });

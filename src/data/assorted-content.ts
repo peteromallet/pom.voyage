@@ -75,9 +75,9 @@ export const ASSORTED_DIRECTORY_ITEMS: DirectoryItem[] = [
     description: "People and topics I'm currently ignoring",
   },
   {
+    href: '/assorted/feedback',
     name: 'Feedback',
     description: "I'm going to allow public feedback from anyone on this website",
-    comingSoon: true,
   },
 ];
 

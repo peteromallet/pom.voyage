@@ -3,8 +3,10 @@ import path from 'node:path';
 import express from 'express';
 import type { ViteDevServer } from 'vite';
 import { CONVERSATION_DETAILS } from './data/assorted-content';
+import { getFeedbackList } from './lib/feedback';
 import { getPostPage, getPosts } from './lib/posts';
-import { getPublicSupabaseConfig } from './lib/supabase';
+import { getPublicSupabaseConfig, supabaseServiceRequest } from './lib/supabase';
+import { tweetFeedbackLink } from './lib/twitter';
 import type { InitialData } from './types';
 
 const root = process.cwd();
@@ -31,6 +33,7 @@ const PAGE_TITLES: Partial<Record<InitialData['page'], string>> = {
   'crypto-conversations': 'Crypto Conversations - POM',
   'mute-list': 'Mute List - POM',
   assorted: 'Assorted - POM',
+  feedback: 'Feedback - POM',
   '404': '404 - Page Not Found',
 };
 
@@ -59,6 +62,112 @@ async function createApp() {
   app.use('/assets', express.static(path.resolve(root, 'assets')));
   app.use('/favicon.ico', express.static(path.resolve(root, 'favicon.ico')));
   app.use('/CNAME', express.static(path.resolve(root, 'CNAME')));
+  app.use(express.json());
+
+  app.post('/api/feedback/anonymous', async (req, res) => {
+    const feedbackText = typeof req.body?.feedback_text === 'string' ? req.body.feedback_text.trim() : '';
+
+    if (!feedbackText) {
+      res.status(400).json({ error: 'Feedback text is required.' });
+      return;
+    }
+
+    if (feedbackText.length > 1000) {
+      res.status(400).json({ error: 'Feedback must be 1000 characters or fewer.' });
+      return;
+    }
+
+    try {
+      await supabaseServiceRequest('feedback', {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          is_anonymous: true,
+          user_id: null,
+          x_username: null,
+          x_user_id: null,
+          x_avatar_url: null,
+          x_followers_count: null,
+          feedback_text: feedbackText,
+          image_paths: [],
+        }),
+      });
+
+      res.json({ success: true });
+
+      // Fire-and-forget tweet (anonymous is always suspicious, but still tweet it)
+      void tweetFeedbackLink({ username: null, isAnonymous: true, feedbackText });
+    } catch (error) {
+      console.warn('Anonymous feedback insert failed:', error);
+      res.status(500).json({ error: 'Failed to submit anonymous feedback.' });
+    }
+  });
+
+  app.post('/api/feedback/notify', async (req, res) => {
+    const username = typeof req.body?.x_username === 'string' ? req.body.x_username : null;
+    const avatarUrl = typeof req.body?.x_avatar_url === 'string' ? req.body.x_avatar_url : null;
+    const feedbackText = typeof req.body?.feedback_text === 'string' ? req.body.feedback_text : '';
+
+    if (!feedbackText) {
+      res.json({ tweeted: false });
+      return;
+    }
+
+    void tweetFeedbackLink({ username, isAnonymous: false, feedbackText, avatarUrl });
+    res.json({ tweeted: true });
+  });
+
+  app.post('/api/feedback/enrich', async (req, res) => {
+    const providerToken = typeof req.body?.provider_token === 'string' ? req.body.provider_token : '';
+    const emptyProfile = {
+      followers_count: null,
+      username: null,
+      profile_image_url: null,
+      account_created_at: null,
+    };
+
+    if (!providerToken) {
+      res.json(emptyProfile);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        'https://api.x.com/2/users/me?user.fields=public_metrics,profile_image_url,created_at',
+        {
+          headers: {
+            Authorization: `Bearer ${providerToken}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const body = await response.text();
+        console.warn(`X enrich failed (${response.status}): ${body}`);
+        res.json(emptyProfile);
+        return;
+      }
+
+      const payload = await response.json() as {
+        data?: {
+          username?: string | null;
+          profile_image_url?: string | null;
+          created_at?: string | null;
+          public_metrics?: { followers_count?: number | null };
+        };
+      };
+
+      res.json({
+        followers_count: payload.data?.public_metrics?.followers_count ?? null,
+        username: payload.data?.username ?? null,
+        profile_image_url: payload.data?.profile_image_url ?? null,
+        account_created_at: payload.data?.created_at ?? null,
+      });
+    } catch (error) {
+      console.warn('X enrich request failed:', error);
+      res.json(emptyProfile);
+    }
+  });
 
   if (!isProd) {
     const viteModule = await import('vite');
@@ -119,6 +228,7 @@ async function createApp() {
         pathname === '/assorted/accountability' ||
         pathname === '/assorted/projects' ||
         pathname === '/assorted/crypto-conversations' ||
+        pathname === '/assorted/feedback' ||
         pathname === '/assorted/mute-list' ||
         /^\/assorted\/crypto-conversations\/[A-Za-z0-9_]+$/.test(pathname)
       ) {
@@ -136,6 +246,12 @@ async function createApp() {
           data = { page: 'projects' };
         } else if (pathname === '/assorted/crypto-conversations') {
           data = { page: 'crypto-conversations' };
+        } else if (pathname === '/assorted/feedback') {
+          const feedback = await getFeedbackList().catch((error) => {
+            console.error('Failed to load feedback list:', error);
+            return [];
+          });
+          data = { page: 'feedback', feedback };
         } else if (pathname === '/assorted/mute-list') {
           data = { page: 'mute-list' };
         } else {

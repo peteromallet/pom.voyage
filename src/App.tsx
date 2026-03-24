@@ -9,6 +9,7 @@ import { AccountabilityPage } from './pages/Accountability';
 import { AssortedPage } from './pages/Assorted';
 import { CryptoConversationPage } from './pages/CryptoConversation';
 import { CryptoConversationsPage } from './pages/CryptoConversations';
+import { FeedbackPage } from './pages/Feedback';
 import { MuteListPage } from './pages/MuteList';
 import { ProjectsPage } from './pages/Projects';
 
@@ -80,6 +81,14 @@ export function App({ initialData }: AppProps) {
         element={
           <SiteFrame showFooter>
             <CryptoConversationPage conversationId={initialData.page === 'crypto-conversation' ? initialData.conversationId : undefined} />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/feedback"
+        element={
+          <SiteFrame showFooter>
+            <FeedbackPage feedback={initialData.page === 'feedback' ? initialData.feedback : undefined} />
           </SiteFrame>
         }
       />
