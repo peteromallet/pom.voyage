@@ -379,7 +379,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                     Sign in to attach your identity, or submit anonymously.
                   </p>
                   {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
-                  {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
+                  {submitSuccess ? <div className="rounded-lg border border-[rgba(74,122,93,0.3)] bg-[rgba(74,122,93,0.08)] px-4 py-3 text-[0.84rem] text-[#4a7a5d]">Feedback submitted successfully.</div> : null}
                 </div>
               ) : !user && anonymousMode ? (
                 <div className="flex flex-col gap-4">
@@ -521,7 +521,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                     </label>
 
                     {formError ? <p className="text-[0.8rem] text-[#a93f34]">{formError}</p> : null}
-                    {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
+                    {submitSuccess ? <div className="rounded-lg border border-[rgba(74,122,93,0.3)] bg-[rgba(74,122,93,0.08)] px-4 py-3 text-[0.84rem] text-[#4a7a5d]">Feedback submitted successfully.</div> : null}
                     {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
 
                     <button
