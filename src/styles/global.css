@@ -104,6 +104,16 @@ button {
   grid-auto-rows: min-content;
 }
 
+.section-toggle {
+  position: relative;
+  z-index: 2;
+  background: rgba(251, 248, 239, 0.75);
+  backdrop-filter: blur(4px);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  display: inline-flex;
+}
+
 .toggle-btn {
   display: inline-block;
   padding: 0.5rem 1rem;
@@ -1023,11 +1033,6 @@ button {
 }
 
 .pom-border-bottom {
-  bottom: -50px;
-  opacity: 0;
-}
-
-.pom-border-bottom:not(.hidden):not(.fading):not(.fading-medium):not(.fading-light) {
   bottom: 10px;
   opacity: 1;
 }
@@ -1481,7 +1486,7 @@ button {
 
 #initialBud {
   position: absolute;
-  top: -2.15rem;
+  top: -2.45rem;
   left: calc(50% + 1.95rem);
   z-index: 999;
   width: 12px;

@@ -33,7 +33,7 @@ export function Header({ activeTab, homeMode = false }: HeaderProps) {
         </Link>
       )}
 
-      <div className="section-toggle mt-0.5 mb-6 flex items-center justify-center gap-3">
+      <div className="section-toggle mt-0.5 mb-6 mx-auto items-center justify-center gap-3">
         <ToggleItem active={activeTab === 'about'} href="/" label="About" currentPath={pathname} />
         <span className="toggle-separator">|</span>
         <ToggleItem active={activeTab === 'posts'} href="/posts" label="Posts" currentPath={pathname} />
