@@ -365,7 +365,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       onClick={handleSignIn}
                       className="inline-flex w-fit items-center justify-center rounded-full bg-[#2f2216] px-5 py-2.5 font-display text-[0.95rem] text-[#fff6ea] transition hover:bg-[#1f140d]"
                     >
-                      Sign in with X to leave feedback
+                      Validate identity with X
                     </button>
                     <button
                       type="button"
