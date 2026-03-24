@@ -60,6 +60,11 @@ export const ASSORTED_DIRECTORY_ITEMS: DirectoryItem[] = [
     description: "Things I've built and am building",
   },
   {
+    href: '/assorted/feedback',
+    name: 'Feedback',
+    description: "I'm going to allow public feedback from anyone on this website",
+  },
+  {
     href: '/assorted/accountability',
     name: 'Accountability',
     description: 'Public commitments and follow-through',
@@ -73,11 +78,6 @@ export const ASSORTED_DIRECTORY_ITEMS: DirectoryItem[] = [
     href: '/assorted/mute-list',
     name: 'Mute list',
     description: "People and topics I'm currently ignoring",
-  },
-  {
-    href: '/assorted/feedback',
-    name: 'Feedback',
-    description: "I'm going to allow public feedback from anyone on this website",
   },
 ];
 

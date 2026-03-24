@@ -24,6 +24,7 @@ export interface FeedbackEntry {
   x_followers_count: number | null;
   x_account_created_at: string | null;
   is_suspicious: boolean;
+  title: string | null;
   feedback_text: string;
   image_paths: string[];
   owner_response: string | null;

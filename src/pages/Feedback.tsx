@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type FormEvent } from 'react';
+import { startTransition, useCallback, useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type FormEvent } from 'react';
 import { Header } from '../components/Header';
 import { useAuth } from '../hooks/useAuth';
 import { getPublicImageUrl } from '../lib/feedback';
@@ -10,7 +10,7 @@ const MAX_FILES = 3;
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const FEEDBACK_SELECT =
-  'id,is_anonymous,x_username,x_avatar_url,x_followers_count,x_account_created_at,is_suspicious,feedback_text,image_paths,owner_response,owner_response_at,created_at';
+  'id,is_anonymous,x_username,x_avatar_url,x_followers_count,x_account_created_at,is_suspicious,title,feedback_text,image_paths,owner_response,owner_response_at,created_at';
 
 function isAccountYoung(entry: FeedbackEntry): boolean {
   if (!entry.x_account_created_at) return false;
@@ -44,6 +44,15 @@ function clampStyle(lines: number): CSSProperties {
     WebkitLineClamp: lines,
     overflow: 'hidden',
   };
+}
+
+function formatStaticDate(timestamp: string): string {
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) {
+    return timestamp;
+  }
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
 }
 
 function formatRelativeTime(timestamp: string): string {
@@ -135,6 +144,9 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
   const [anonSubmitting, setAnonSubmitting] = useState(false);
   const [anonError, setAnonError] = useState<string | null>(null);
   const [showSuspicious, setShowSuspicious] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
 
   useEffect(() => {
     setFeedbackEntries(initialFeedback);
@@ -200,6 +212,8 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
 
       setAnonText('');
       setAnonymousMode(false);
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 4000);
       await refreshFeedback();
     } catch (error) {
       setAnonError(error instanceof Error ? error.message : 'Failed to submit anonymous feedback.');
@@ -301,6 +315,8 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 4000);
       await refreshFeedback();
     } catch (error) {
       if (uploadedPaths.length > 0) {
@@ -325,10 +341,10 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
             <div>
               <p className="font-display text-[0.75rem] uppercase tracking-[0.28em] text-[#9c7a5d]">Public criticism</p>
               <h1 className="mt-2 font-display text-[2rem] leading-[1.05] text-[#2f2216] sm:text-[2.5rem]">
-                Share anonymous feedback that will be listed publicly. Attach receipts.
+                Share public feedback or criticism for POM. Attach receipts.
               </h1>
               <p className="mt-3 text-[0.88rem] leading-[1.8] text-[#6a5a4d]">
-                In the spirit of openness, anyone can share open feedback or criticism that will live forever here. Anonymous or suspicious entries — accounts newer than one year or with fewer than 500 followers — will be flagged as potentially suspicious.
+                In the spirit of openness, anyone can share open feedback or criticism that will live forever here. Anonymous or suspicious entries — accounts newer than one year or with fewer than 500 followers — will be flagged as potentially suspicious but still listed.
               </p>
             </div>
 
@@ -357,6 +373,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                     Sign in to attach your identity, or submit anonymously.
                   </p>
                   {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
+                  {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
                 </div>
               ) : !user && anonymousMode ? (
                 <div className="flex flex-col gap-4">
@@ -443,22 +460,27 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                         className="min-h-[160px] rounded-[16px] border border-[rgba(145,118,90,0.22)] bg-[rgba(255,253,249,0.95)] px-4 py-3 text-[0.92rem] leading-[1.7] text-[#2f2216] outline-none transition focus:border-[rgba(99,72,47,0.55)]"
                       />
                     </label>
-                    <div className="flex items-center justify-between text-[0.75rem] text-[#7c6a5b]">
-                      <span>Be specific if you want a useful response.</span>
+                    <div className="flex justify-end text-[0.75rem] text-[#7c6a5b]">
                       <span>{feedbackText.length}/{MAX_FEEDBACK_LENGTH}</span>
                     </div>
 
-                    <label className="flex flex-col gap-2">
-                      <span className="font-display text-[0.95rem] text-[#2f2216]">Evidence images</span>
+                    <div className="flex flex-col gap-2">
                       <input
                         ref={fileInputRef}
                         type="file"
                         accept={ACCEPTED_TYPES.join(',')}
                         multiple
                         onChange={handleFileChange}
-                        className="rounded-[16px] border border-dashed border-[rgba(145,118,90,0.28)] bg-[rgba(255,250,244,0.85)] px-4 py-3 text-[0.82rem] text-[#6a5a4d]"
+                        className="hidden"
                       />
-                    </label>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-[16px] border border-dashed border-[rgba(145,118,90,0.3)] bg-[rgba(255,250,244,0.85)] px-4 py-3 text-[0.82rem] text-[#6a5a4d] transition hover:border-[rgba(145,118,90,0.5)] hover:bg-[rgba(255,247,236,0.95)]"
+                      >
+                        Attach images (optional)
+                      </button>
+                    </div>
 
                     {selectedFiles.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
@@ -474,6 +496,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                     ) : null}
 
                     {formError ? <p className="text-[0.8rem] text-[#a93f34]">{formError}</p> : null}
+                    {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
                     {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
 
                     <button
@@ -490,23 +513,16 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
           </section>
 
           <section className="mt-8 flex flex-col gap-4 pb-16">
-            {feedbackEntries.length > 0 ? (
-              <div className="flex items-center gap-3">
-                <label className="flex cursor-pointer items-center gap-2 text-[0.82rem] text-[#6a5a4d]">
-                  <input
-                    type="checkbox"
-                    checked={showSuspicious}
-                    onChange={(e) => setShowSuspicious(e.target.checked)}
-                    className="accent-[#9c7a5d]"
-                  />
-                  Show suspicious entries
-                </label>
-                {!showSuspicious ? (
-                  <span className="text-[0.75rem] text-[#8a7868]">
-                    ({feedbackEntries.filter((e) => isSuspicious(e)).length} hidden)
-                  </span>
-                ) : null}
-              </div>
+            {feedbackEntries.length > 0 && feedbackEntries.some((e) => isSuspicious(e)) ? (
+              <label className="flex cursor-pointer items-center gap-2 text-[0.82rem] text-[#6a5a4d]">
+                <input
+                  type="checkbox"
+                  checked={showSuspicious}
+                  onChange={(e) => setShowSuspicious(e.target.checked)}
+                  className="accent-[#9c7a5d]"
+                />
+                Show {feedbackEntries.filter((e) => isSuspicious(e)).length} suspicious {feedbackEntries.filter((e) => isSuspicious(e)).length === 1 ? 'entry' : 'entries'}
+              </label>
             ) : null}
             {feedbackEntries.length === 0 ? (
               <div className="rounded-[18px] border border-[rgba(145,118,90,0.16)] bg-[rgba(255,255,255,0.76)] p-6 text-[0.84rem] text-[#7c6a5b]">
@@ -516,6 +532,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
               feedbackEntries.filter((entry) => showSuspicious || !isSuspicious(entry)).map((entry) => {
                 const expanded = Boolean(expandedEntries[entry.id]);
                 const xHref = getXHref(entry.x_username);
+                const hasExpandableContent = entry.feedback_text.length > 150 || entry.image_paths.length > 0 || Boolean(entry.owner_response);
 
                 return (
                   <article
@@ -555,7 +572,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                             <p className="font-display text-[1rem] text-[#2f2216]">Unknown account</p>
                           )}
                           <p className="text-[0.76rem] text-[#8a7868]" title={new Date(entry.created_at).toLocaleString()}>
-                            {formatRelativeTime(entry.created_at)}
+                            {hydrated ? formatRelativeTime(entry.created_at) : formatStaticDate(entry.created_at)}
                           </p>
                         </div>
                       </div>
@@ -569,25 +586,20 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                             {reason}
                           </span>
                         )) : null}
-                        {!entry.is_anonymous && entry.x_followers_count !== null ? (
-                          <span className="rounded-full bg-[rgba(145,118,90,0.1)] px-3 py-1 text-[0.72rem] text-[#6a5a4d]">
-                            {entry.x_followers_count.toLocaleString()} followers
-                          </span>
-                        ) : null}
                       </div>
                     </div>
 
                     <div className="mt-4 space-y-4">
-                      <div>
-                        <p className="mb-1 font-display text-[0.88rem] text-[#2f2216]">Feedback</p>
-                        <p className="whitespace-pre-wrap text-[0.86rem] leading-[1.8] text-[#594a3f]" style={expanded ? undefined : clampStyle(3)}>
-                          {entry.feedback_text}
-                        </p>
-                      </div>
+                      {entry.title ? (
+                        <p className="font-display text-[1.05rem] leading-[1.3] text-[#2f2216]">{entry.title}</p>
+                      ) : null}
+                      <p className="whitespace-pre-wrap text-[0.86rem] leading-[1.8] text-[#594a3f]" style={expanded ? undefined : clampStyle(3)}>
+                        {entry.feedback_text}
+                      </p>
 
                       {entry.owner_response ? (
                         <div className="rounded-[16px] bg-[rgba(252,247,239,0.92)] p-4">
-                          <p className="mb-1 font-display text-[0.88rem] text-[#2f2216]">Response</p>
+                          <p className="mb-1 font-display text-[0.78rem] uppercase tracking-[0.18em] text-[#9c7a5d]">Response</p>
                           <p
                             className="whitespace-pre-wrap text-[0.84rem] leading-[1.75] text-[#69594d]"
                             style={expanded ? undefined : clampStyle(5)}
@@ -611,18 +623,20 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                         </div>
                       ) : null}
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setExpandedEntries((current) => ({
-                            ...current,
-                            [entry.id]: !current[entry.id],
-                          }));
-                        }}
-                        className="text-[0.8rem] uppercase tracking-[0.16em] text-[#8b6a4f]"
-                      >
-                        {expanded ? 'Collapse' : 'Expand'}
-                      </button>
+                      {hasExpandableContent ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setExpandedEntries((current) => ({
+                              ...current,
+                              [entry.id]: !current[entry.id],
+                            }));
+                          }}
+                          className="text-[0.8rem] uppercase tracking-[0.16em] text-[#8b6a4f]"
+                        >
+                          {expanded ? 'Collapse' : 'Expand'}
+                        </button>
+                      ) : null}
                     </div>
                   </article>
                 );

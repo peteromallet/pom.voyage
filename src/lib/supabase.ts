@@ -45,11 +45,12 @@ export async function supabaseRestRequest<T>(
     throw new Error(`Supabase request failed (${response.status}): ${body}`);
   }
 
-  if (response.status === 204) {
+  const text = await response.text();
+  if (!text) {
     return [] as unknown as T;
   }
 
-  return (await response.json()) as T;
+  return JSON.parse(text) as T;
 }
 
 export async function supabaseServiceRequest<T>(
@@ -78,9 +79,10 @@ export async function supabaseServiceRequest<T>(
     throw new Error(`Supabase service request failed (${response.status}): ${body}`);
   }
 
-  if (response.status === 204) {
+  const text = await response.text();
+  if (!text) {
     return [] as unknown as T;
   }
 
-  return (await response.json()) as T;
+  return JSON.parse(text) as T;
 }

@@ -83,13 +83,12 @@ async function createApp() {
         headers: { Prefer: 'return=minimal' },
         body: JSON.stringify({
           is_anonymous: true,
-          user_id: null,
           x_username: null,
           x_user_id: null,
           x_avatar_url: null,
           x_followers_count: null,
           feedback_text: feedbackText,
-          image_paths: [],
+          image_paths: '{}',
         }),
       });
 
