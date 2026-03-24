@@ -406,7 +406,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       className="min-h-[160px] rounded-[16px] border border-[rgba(145,118,90,0.22)] bg-[rgba(255,253,249,0.95)] px-4 py-3 text-[0.92rem] leading-[1.7] text-[#2f2216] outline-none transition focus:border-[rgba(99,72,47,0.55)]"
                     />
                     <div className="flex items-center justify-between text-[0.75rem] text-[#7c6a5b]">
-                      <span>No images allowed for anonymous submissions.</span>
+
                       <span>{anonText.length}/{MAX_FEEDBACK_LENGTH}</span>
                     </div>
                     <label className="flex cursor-pointer items-center gap-2 text-[0.82rem] text-[#6a5a4d]">
