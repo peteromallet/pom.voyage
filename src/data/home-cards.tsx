@@ -235,8 +235,7 @@ export const HOME_CARDS: HomeCardData[] = [
     imageSrc: asset('tools-for-agents.jpeg'),
     imageAlt: 'Tools for agents',
     paragraphs: [
-      "I'm very interested in building tools to enhance the capabilities of agents across both engineering and creative domains. Agents are a huge lever — and I want to help extend them.",
-      "Some examples: Megaplan for structured AI planning with enforced critique loops, VibeComfy for creative generation via ComfyUI, Desloppify for cleaning up and improving engineering quality, and Dataclaw for scraping and structuring data.",
+      "I'm very interested in building tools to enhance the capabilities of agents across both engineering and creative domains.",
     ],
     linkLinks: [
       { label: 'Desloppify', href: 'https://github.com/peteromallet/desloppify' },

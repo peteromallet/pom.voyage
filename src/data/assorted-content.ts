@@ -291,9 +291,9 @@ export const PROJECTS: ProjectEntry[] = [
     date: 'Mar 2026-now',
     ongoing: true,
     parts: [
-      'AI plans are often sloppy and incomplete. I built ',
-      { type: 'link', label: 'megaplan', href: 'https://github.com/peteromallet/megaplan', className: 'project-link' },
-      ' — a structured planning loop that enforces sequencing, critique, and audit artifacts. Plans get reviewed by a separate AI critic before execution.',
+      'Claude is very good for high-level thinking and strategy, while GPT is extremely good for detail-oriented execution. To combine both their strengths, I built ',
+      { type: 'link', label: 'Megaplan', href: 'https://github.com/peteromallet/megaplan', className: 'project-link' },
+      " to allow them to create better plans together than either can individually. It works as a loop until both are satisfied that the plan is extremely robust — which I think correlates with being generally much better in reality.",
     ],
   },
   {
