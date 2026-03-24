@@ -140,9 +140,13 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
   const [formError, setFormError] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [anonymousMode, setAnonymousMode] = useState(false);
+  const [privateMode, setPrivateMode] = useState(false);
   const [anonText, setAnonText] = useState('');
   const [anonSubmitting, setAnonSubmitting] = useState(false);
   const [anonError, setAnonError] = useState<string | null>(null);
+  const [privateText, setPrivateText] = useState('');
+  const [privateSubmitting, setPrivateSubmitting] = useState(false);
+  const [privateError, setPrivateError] = useState<string | null>(null);
   const [showSuspicious, setShowSuspicious] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -219,6 +223,44 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
       setAnonError(error instanceof Error ? error.message : 'Failed to submit anonymous feedback.');
     } finally {
       setAnonSubmitting(false);
+    }
+  };
+
+  const handlePrivateSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = privateText.trim();
+    if (!trimmed) {
+      setPrivateError('Feedback cannot be empty.');
+      return;
+    }
+    if (trimmed.length > MAX_FEEDBACK_LENGTH) {
+      setPrivateError(`Feedback must be ${MAX_FEEDBACK_LENGTH} characters or fewer.`);
+      return;
+    }
+
+    setPrivateSubmitting(true);
+    setPrivateError(null);
+
+    try {
+      const response = await fetch('/api/feedback/private', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedback_text: trimmed }),
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({ error: 'Submission failed.' }));
+        throw new Error(body.error ?? 'Submission failed.');
+      }
+
+      setPrivateText('');
+      setPrivateMode(false);
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 4000);
+    } catch (error) {
+      setPrivateError(error instanceof Error ? error.message : 'Failed to submit private feedback.');
+    } finally {
+      setPrivateSubmitting(false);
     }
   };
 
@@ -351,7 +393,7 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
             <div className="mt-6 rounded-[18px] border border-[rgba(145,118,90,0.18)] bg-[rgba(255,255,255,0.74)] p-5">
               {loading ? (
                 <p className="text-[0.82rem] text-[#7c6a5b]">Checking your X session...</p>
-              ) : !user && !anonymousMode ? (
+              ) : !user && !anonymousMode && !privateMode ? (
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap gap-3">
                     <button
@@ -366,14 +408,59 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
                       onClick={() => setAnonymousMode(true)}
                       className="inline-flex w-fit items-center justify-center rounded-full border border-[rgba(145,118,90,0.24)] px-5 py-2.5 font-display text-[0.95rem] text-[#6a5a4d] transition hover:border-[rgba(145,118,90,0.42)] hover:text-[#2f2216]"
                     >
-                      Submit anonymously
+                      Submit publicly &amp; anonymously
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPrivateMode(true)}
+                      className="inline-flex w-fit items-center justify-center rounded-full border border-[rgba(145,118,90,0.24)] px-5 py-2.5 font-display text-[0.95rem] text-[#6a5a4d] transition hover:border-[rgba(145,118,90,0.42)] hover:text-[#2f2216]"
+                    >
+                      Submit privately
                     </button>
                   </div>
                   <p className="text-[0.8rem] leading-[1.7] text-[#7c6a5b]">
-                    Sign in to attach your identity, or submit anonymously.
+                    Sign in to attach your identity, submit anonymously (still listed publicly), or submit privately (only I will see it).
                   </p>
                   {authError ? <p className="text-[0.8rem] text-[#a93f34]">{authError}</p> : null}
                   {submitSuccess ? <p className="text-[0.8rem] text-[#4a7a5d]">Feedback submitted successfully.</p> : null}
+                </div>
+              ) : !user && privateMode ? (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <p className="font-display text-[1rem] text-[#2f2216]">Private feedback</p>
+                    <button
+                      type="button"
+                      onClick={() => { setPrivateMode(false); setPrivateError(null); }}
+                      className="text-[0.82rem] text-[#8b6a4f] underline underline-offset-4"
+                    >
+                      Back to options
+                    </button>
+                  </div>
+                  <p className="text-[0.8rem] leading-[1.7] text-[#7c6a5b]">
+                    This feedback will only be visible to me. It won&apos;t be posted publicly.
+                  </p>
+                  <form onSubmit={handlePrivateSubmit} className="flex flex-col gap-4">
+                    <textarea
+                      value={privateText}
+                      onChange={(event) => setPrivateText(event.target.value.slice(0, MAX_FEEDBACK_LENGTH))}
+                      maxLength={MAX_FEEDBACK_LENGTH}
+                      rows={6}
+                      placeholder="Your private feedback..."
+                      className="min-h-[160px] rounded-[16px] border border-[rgba(145,118,90,0.22)] bg-[rgba(255,253,249,0.95)] px-4 py-3 text-[0.92rem] leading-[1.7] text-[#2f2216] outline-none transition focus:border-[rgba(99,72,47,0.55)]"
+                    />
+                    <div className="flex items-center justify-between text-[0.75rem] text-[#7c6a5b]">
+                      <span>Only visible to the site owner.</span>
+                      <span>{privateText.length}/{MAX_FEEDBACK_LENGTH}</span>
+                    </div>
+                    {privateError ? <p className="text-[0.8rem] text-[#a93f34]">{privateError}</p> : null}
+                    <button
+                      type="submit"
+                      disabled={privateSubmitting}
+                      className="inline-flex w-fit items-center justify-center rounded-full bg-[#9c7a5d] px-5 py-2.5 font-display text-[0.95rem] text-[#fff8f0] transition hover:bg-[#7e5f46] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {privateSubmitting ? 'Submitting...' : 'Submit private feedback'}
+                    </button>
+                  </form>
                 </div>
               ) : !user && anonymousMode ? (
                 <div className="flex flex-col gap-4">
