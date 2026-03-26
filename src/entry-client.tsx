@@ -15,6 +15,10 @@ declare global {
 
 const initialData = window.__INITIAL_DATA__ ?? { page: 'home' };
 
+// Clear SSR data after capture so it's only used for the first hydration render.
+// Without this, client-side navigation reuses stale SSR data from the wrong page.
+delete window.__INITIAL_DATA__;
+
 hydrateRoot(
   document.getElementById('root') as HTMLElement,
   <React.StrictMode>

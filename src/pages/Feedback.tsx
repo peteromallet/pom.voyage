@@ -128,11 +128,12 @@ interface FeedbackPageProps {
   feedback?: FeedbackEntry[];
 }
 
-export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPageProps) {
+export function FeedbackPage({ feedback }: FeedbackPageProps) {
   const supabase = getSupabaseBrowserClient();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { user, session, loading, xProfile, signInWithTwitter, signOut } = useAuth();
-  const [feedbackEntries, setFeedbackEntries] = useState<FeedbackEntry[]>(initialFeedback);
+  const hasSSRData = feedback !== undefined && feedback.length > 0;
+  const [feedbackEntries, setFeedbackEntries] = useState<FeedbackEntry[]>(feedback ?? []);
   const [feedbackText, setFeedbackText] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({});
@@ -149,9 +150,14 @@ export function FeedbackPage({ feedback: initialFeedback = [] }: FeedbackPagePro
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
 
+  // Fetch client-side when navigated to without SSR data
   useEffect(() => {
-    setFeedbackEntries(initialFeedback);
-  }, [initialFeedback]);
+    if (!hasSSRData && supabase) {
+      void fetchFeedbackEntries(supabase).then((entries) => {
+        startTransition(() => setFeedbackEntries(entries));
+      }).catch(() => undefined);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshFeedback = async () => {
     if (!supabase) {

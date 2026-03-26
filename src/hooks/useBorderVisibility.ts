@@ -18,10 +18,6 @@ export function useBorderVisibility() {
     if (distanceFromBottom <= 0) {
       bottomBorderClassName += ' hidden';
     } else if (distanceFromBottom < 50) {
-      bottomBorderClassName += ' fading-light';
-    } else if (distanceFromBottom < 100) {
-      bottomBorderClassName += ' fading-medium';
-    } else if (distanceFromBottom < 200) {
       bottomBorderClassName += ' fading';
     }
 

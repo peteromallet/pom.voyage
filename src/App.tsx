@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { SiteFrame } from './components/SiteFrame';
 import type { InitialData } from './types';
 import { HomePage } from './pages/Home';
@@ -17,7 +18,12 @@ interface AppProps {
   initialData: InitialData;
 }
 
-export function App({ initialData }: AppProps) {
+export function App({ initialData: ssrData }: AppProps) {
+  const location = useLocation();
+  const [ssrPath] = useState(location.pathname);
+  // Only use SSR data if we're still on the page that was server-rendered.
+  // Any client-side navigation to a different path gets no SSR data.
+  const initialData = location.pathname === ssrPath ? ssrData : ({ page: 'home' } as InitialData);
   return (
     <Routes>
       <Route

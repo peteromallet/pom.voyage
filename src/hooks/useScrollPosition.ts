@@ -8,7 +8,7 @@ interface ScrollPositionState {
 
 function getState(): ScrollPositionState {
   if (typeof window === 'undefined') {
-    return { scrollY: 0, scrollPercent: 0, distanceFromBottom: 0 };
+    return { scrollY: 0, scrollPercent: 0, distanceFromBottom: Infinity };
   }
 
   const scrollY = window.pageYOffset || document.documentElement.scrollTop;
@@ -48,12 +48,17 @@ export function useScrollPosition() {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
+
+    const observer = new ResizeObserver(onScroll);
+    observer.observe(document.documentElement);
+
     update();
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      observer.disconnect();
     };
   }, []);
 

@@ -14,8 +14,11 @@ export function PostPage({ data: initialData }: PostPageProps) {
   const [loading, setLoading] = useState(!initialData?.post);
 
   useEffect(() => {
-    if (initialData?.post) return;
+    if (initialData?.post?.slug === slug) return;
     if (!slug) return;
+
+    setData(null);
+    setLoading(true);
 
     getClientPostPage(slug)
       .then((result) => {
