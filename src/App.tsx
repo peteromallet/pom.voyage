@@ -13,6 +13,7 @@ import { CryptoConversationsPage } from './pages/CryptoConversations';
 import { FeedbackPage } from './pages/Feedback';
 import { MuteListPage } from './pages/MuteList';
 import { ProjectsPage } from './pages/Projects';
+import { RecommendationsPage } from './pages/Recommendations';
 
 interface AppProps {
   initialData: InitialData;
@@ -103,6 +104,14 @@ export function App({ initialData: ssrData }: AppProps) {
         element={
           <SiteFrame showFooter>
             <MuteListPage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/recommendations"
+        element={
+          <SiteFrame showFooter>
+            <RecommendationsPage recommendations={initialData.page === 'recommendations' ? initialData.recommendations : undefined} />
           </SiteFrame>
         }
       />

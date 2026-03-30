@@ -5,6 +5,7 @@ import type { ViteDevServer } from 'vite';
 import { CONVERSATION_DETAILS } from './data/assorted-content';
 import { getFeedbackList } from './lib/feedback';
 import { getPostPage, getPosts } from './lib/posts';
+import { getRecommendationsList } from './lib/recommendations';
 import { getPublicSupabaseConfig, supabaseServiceRequest } from './lib/supabase';
 import { tweetFeedbackLink } from './lib/twitter';
 import type { InitialData } from './types';
@@ -32,6 +33,7 @@ const PAGE_TITLES: Partial<Record<InitialData['page'], string>> = {
   projects: 'Projects - POM',
   'crypto-conversations': 'Crypto Conversations - POM',
   'mute-list': 'Mute List - POM',
+  recommendations: 'Recommendations - POM',
   assorted: 'Assorted - POM',
   feedback: 'Feedback - POM',
   '404': '404 - Page Not Found',
@@ -234,6 +236,7 @@ async function createApp() {
         pathname === '/assorted/crypto-conversations' ||
         pathname === '/assorted/feedback' ||
         pathname === '/assorted/mute-list' ||
+        pathname === '/assorted/recommendations' ||
         /^\/assorted\/crypto-conversations\/[A-Za-z0-9_]+$/.test(pathname)
       ) {
         if (pathname.startsWith('/assorted/crypto-conversations/')) {
@@ -258,6 +261,12 @@ async function createApp() {
           data = { page: 'feedback', feedback };
         } else if (pathname === '/assorted/mute-list') {
           data = { page: 'mute-list' };
+        } else if (pathname === '/assorted/recommendations') {
+          const recommendations = await getRecommendationsList().catch((error) => {
+            console.error('Failed to load recommendations:', error);
+            return [];
+          });
+          data = { page: 'recommendations', recommendations };
         } else {
           data = { page: 'assorted' };
         }

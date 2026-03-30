@@ -32,6 +32,24 @@ export interface FeedbackEntry {
   created_at: string;
 }
 
+export interface RecommendationEntry {
+  id: string;
+  name: string;
+  role_title: string;
+  emoji: string;
+  linkedin_url: string | null;
+  location: string | null;
+  body_markdown: string;
+  image_url: string | null;
+  intro_url: string | null;
+  context: string | null;
+  status: string;
+  is_hired: boolean;
+  is_freelancer: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface AppConfig {
   supabaseUrl: string;
   supabaseAnonKey: string;
@@ -48,4 +66,5 @@ export type InitialData =
   | { page: 'crypto-conversations' }
   | { page: 'crypto-conversation'; conversationId: string }
   | { page: 'mute-list' }
+  | { page: 'recommendations'; recommendations: RecommendationEntry[] }
   | { page: '404' };

@@ -60,6 +60,11 @@ export const ASSORTED_DIRECTORY_ITEMS: DirectoryItem[] = [
     description: "Things I've built and am building",
   },
   {
+    href: '/assorted/recommendations',
+    name: 'Recommendations',
+    description: "Fine individuals I recommend",
+  },
+  {
     href: '/assorted/feedback',
     name: 'Feedback',
     description: "I'm going to allow public feedback from anyone on this website",
