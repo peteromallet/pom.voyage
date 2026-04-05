@@ -54,8 +54,7 @@ function safeJson(value: unknown) {
 }
 
 async function createApp() {
-  const distExists = await fs.access(path.resolve(root, 'dist/client/index.html')).then(() => true, () => false);
-  const isProd = process.env.NODE_ENV === 'production' || distExists;
+  const isProd = process.env.NODE_ENV === 'production';
   const port = Number(process.env.PORT || 3002);
   const host = '0.0.0.0';
   const app = express();
@@ -234,6 +233,7 @@ async function createApp() {
         pathname === '/assorted/accountability' ||
         pathname === '/assorted/projects' ||
         pathname === '/assorted/crypto-conversations' ||
+        pathname === '/assorted/experiments' ||
         pathname === '/assorted/feedback' ||
         pathname === '/assorted/mute-list' ||
         pathname === '/assorted/recommendations' ||
@@ -259,6 +259,8 @@ async function createApp() {
             return [];
           });
           data = { page: 'feedback', feedback };
+        } else if (pathname === '/assorted/experiments') {
+          data = { page: 'experiments' };
         } else if (pathname === '/assorted/mute-list') {
           data = { page: 'mute-list' };
         } else if (pathname === '/assorted/recommendations') {

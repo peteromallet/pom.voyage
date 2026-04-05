@@ -9,6 +9,7 @@ import { PostsPage } from './pages/Posts';
 import { AccountabilityPage } from './pages/Accountability';
 import { AssortedPage } from './pages/Assorted';
 import { CryptoConversationPage } from './pages/CryptoConversation';
+import { ExperimentsPage } from './pages/Experiments';
 import { CryptoConversationsPage } from './pages/CryptoConversations';
 import { FeedbackPage } from './pages/Feedback';
 import { MuteListPage } from './pages/MuteList';
@@ -22,6 +23,10 @@ interface AppProps {
 export function App({ initialData: ssrData }: AppProps) {
   const location = useLocation();
   const [ssrPath] = useState(location.pathname);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   // Only use SSR data if we're still on the page that was server-rendered.
   // Any client-side navigation to a different path gets no SSR data.
   const initialData = location.pathname === ssrPath ? ssrData : ({ page: 'home' } as InitialData);
@@ -56,6 +61,14 @@ export function App({ initialData: ssrData }: AppProps) {
         element={
           <SiteFrame showFooter>
             <AssortedPage />
+          </SiteFrame>
+        }
+      />
+      <Route
+        path="/assorted/experiments"
+        element={
+          <SiteFrame showFooter>
+            <ExperimentsPage />
           </SiteFrame>
         }
       />

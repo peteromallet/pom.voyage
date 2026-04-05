@@ -65,6 +65,7 @@ export type InitialData =
   | { page: 'projects' }
   | { page: 'crypto-conversations' }
   | { page: 'crypto-conversation'; conversationId: string }
+  | { page: 'experiments' }
   | { page: 'mute-list' }
   | { page: 'recommendations'; recommendations: RecommendationEntry[] }
   | { page: '404' };
