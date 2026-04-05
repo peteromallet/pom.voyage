@@ -48,7 +48,7 @@ export function StoryCard({ card }: { card: StoryCardData }) {
   return (
     <>
       <div className="card-image-container">
-        <img src={card.imageSrc} alt={card.imageAlt} />
+        <img src={card.imageSrc} alt={card.imageAlt} loading="lazy" />
       </div>
       <h3>{card.title}</h3>
       <div className="card-text-content">
@@ -79,10 +79,10 @@ export function ProjectCard({ card }: { card: ProjectCardData }) {
   return (
     <>
       <div className="card-image-container">
-        <img src={card.imageSrc} alt={card.imageAlt} />
+        <img src={card.imageSrc} alt={card.imageAlt} loading="lazy" />
         {card.hoverGifSrc ? (
           <div className="card-hover-gif">
-            <img src={card.hoverGifSrc} alt={card.hoverGifAlt} className="ignore-load" />
+            <video src={card.hoverGifSrc} autoPlay loop muted playsInline preload="none" className="ignore-load" />
           </div>
         ) : null}
       </div>
@@ -143,7 +143,7 @@ export function MemeCard({
   return (
     <>
       <div className="card-image-container">
-        <img src={card.imageSrc} alt={card.imageAlt} className="card-main-image" />
+        <img src={card.imageSrc} alt={card.imageAlt} className="card-main-image" loading="lazy" />
       </div>
       <h3>{card.title}</h3>
       <div className="card-text-content">
@@ -160,7 +160,7 @@ export function MemeCard({
             className="meme-image"
             style={expanded ? { transitionDelay: `${0.1 * (index + 1)}s` } : undefined}
           >
-            <img src={image.src} alt={image.alt} />
+            <img src={image.src} alt={image.alt} loading="lazy" />
           </div>
         ))}
       </div>

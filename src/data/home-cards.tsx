@@ -153,7 +153,7 @@ export const HOME_CARDS: HomeCardData[] = [
     position: 2,
     category: 'initiatives',
     cardClassName: 'card story-tile loading-element',
-    imageSrc: asset('open-source-ai-art.png'),
+    imageSrc: asset('open-source-ai-art.jpg'),
     imageAlt: 'Story visual',
     paragraphs: [
       'I spent the past two years building the Banodoco discord, a community that aims to capture everything that I love about the open source AI art ecosystem.',
@@ -194,7 +194,7 @@ export const HOME_CARDS: HomeCardData[] = [
     cardClassName: 'card project-tile loading-element',
     imageSrc: asset('steerable-motion-visual.png'),
     imageAlt: 'Steerable Motion visual',
-    hoverGifSrc: asset('steerable-motion-animation.gif'),
+    hoverGifSrc: asset('steerable-motion-animation.mp4'),
     hoverGifAlt: 'Steerable Motion animation',
     body: [
       'Building upon the developments of the community, I created what I believe was the first streamlined method for controlling video diffusion models using key frames. My approach extensively used the work of ',
@@ -216,7 +216,7 @@ export const HOME_CARDS: HomeCardData[] = [
     position: 4,
     category: 'posts',
     cardClassName: 'card story-tile loading-element',
-    imageSrc: asset('renaissance-visual.png'),
+    imageSrc: asset('renaissance-visual.jpg'),
     imageAlt: 'Renaissance visual',
     paragraphs: [
       'If humanity plays its cards right, at some point this century, a period known as the "2nd Renaissance" will begin - a time when humans are empowered with extraordinary technology and wealth, and are inspired to use it to make the world more beautiful and meaningful. If you believe in this idea and dedicate your life to it, you may be able to accelerate the advent of this era by a few days.',
@@ -279,7 +279,7 @@ export const HOME_CARDS: HomeCardData[] = [
     imageAlt: 'Meme placeholder',
     body: [],
     memeImages: [
-      { src: asset('meme-princess-mononoke.png'), alt: 'Princess Mononoke meme' },
+      { src: asset('meme-princess-mononoke.jpg'), alt: 'Princess Mononoke meme' },
       { src: asset('meme-kanye.jpg'), alt: 'Kanye' },
       { src: asset('meme-discord-power.jpeg'), alt: 'Discord Power meme' },
       { src: asset('meme-rats.jpg'), alt: 'Rats' },
