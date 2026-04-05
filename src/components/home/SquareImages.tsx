@@ -7,9 +7,16 @@ interface SquareImagesProps {
 }
 
 export function SquareImages({ images }: SquareImagesProps) {
-  const { activeIndex, isMobile, onEnter, onLeave, onToggle } = useImageHover(images.length);
+  const { activeIndex, onEnter, onLeave, onToggle } = useImageHover(images.length);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+
+  // Preload all videos in background on mount
+  useEffect(() => {
+    videoRefs.current.forEach((video) => {
+      if (video) video.preload = 'auto';
+    });
+  }, []);
 
   useEffect(() => {
     if (playingIndex === null) return;
@@ -44,9 +51,13 @@ export function SquareImages({ images }: SquareImagesProps) {
                 onClick={() => {
                   const video = videoRefs.current[index];
                   if (!video) return;
-                  setPlayingIndex(index);
                   video.currentTime = image.startTime;
-                  video.style.display = 'block';
+                  const hideImageAndPlay = () => {
+                    video.removeEventListener('playing', hideImageAndPlay);
+                    setPlayingIndex(index);
+                    video.style.display = 'block';
+                  };
+                  video.addEventListener('playing', hideImageAndPlay);
                   void video.play();
                 }}
               />
@@ -55,7 +66,7 @@ export function SquareImages({ images }: SquareImagesProps) {
                   videoRefs.current[index] = node;
                 }}
                 src={image.videoSrc}
-                preload={isMobile ? 'metadata' : 'auto'}
+                preload="metadata"
                 playsInline
                 className="square-image-media"
                 style={{ display: 'none' }}

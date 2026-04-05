@@ -109,7 +109,7 @@ export const HOME_SQUARE_IMAGES: SquareImageData[] = [
   {
     alt: 'Square image 3',
     label: 'How my dog sees me',
-    imageSrc: asset('how-dog-sees-me.png'),
+    imageSrc: asset('how-dog-sees-me.jpg'),
     videoSrc: asset('how-dog-sees-me.mp4'),
     startTime: 0.2,
   },
