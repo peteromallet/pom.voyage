@@ -5,6 +5,7 @@ import { Dashboard } from '../components/home/Dashboard';
 import { FilterButtons } from '../components/home/FilterButtons';
 import { SocialLinks } from '../components/home/SocialLinks';
 import { SquareImages } from '../components/home/SquareImages';
+import { VideosReadyProvider } from '../hooks/useVideosReady';
 import {
   HOME_CARDS,
   HOME_FILTERS,
@@ -21,15 +22,17 @@ export function HomePage() {
   useLoadingStagger(aboutRef);
 
   return (
-    <div className="container">
-      <Header activeTab="about" homeMode />
-      <div id="about-section" className="content-section pb-20" ref={aboutRef}>
-        <SquareImages images={HOME_SQUARE_IMAGES} />
-        <SocialLinks links={HOME_SOCIAL_LINKS} />
-        <FilterButtons filters={HOME_FILTERS} isActive={isActive} onToggle={toggleFilter} />
-        <Dashboard cards={visibleCards} itemRefs={itemRefs} />
+    <VideosReadyProvider>
+      <div className="container">
+        <Header activeTab="about" homeMode />
+        <div id="about-section" className="content-section pb-20" ref={aboutRef}>
+          <SquareImages images={HOME_SQUARE_IMAGES} />
+          <SocialLinks links={HOME_SOCIAL_LINKS} />
+          <FilterButtons filters={HOME_FILTERS} isActive={isActive} onToggle={toggleFilter} />
+          <Dashboard cards={visibleCards} itemRefs={itemRefs} />
+        </div>
+        <PlantCanvas />
       </div>
-      <PlantCanvas />
-    </div>
+    </VideosReadyProvider>
   );
 }

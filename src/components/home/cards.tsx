@@ -8,6 +8,7 @@ import type {
   StoryCardData,
   VideoCardData,
 } from '../../data/home-cards';
+import { useVideosReady } from '../../hooks/useVideosReady';
 import { VideoPlayer } from '../VideoPlayer';
 import { WeightsChart } from '../WeightsChart';
 
@@ -76,11 +77,12 @@ function renderProjectBodyPart(part: string | JSXLink, index: number) {
 }
 
 export function ProjectCard({ card }: { card: ProjectCardData }) {
+  const videosReady = useVideosReady();
   return (
     <>
       <div className="card-image-container">
         <img src={card.imageSrc} alt={card.imageAlt} loading="lazy" />
-        {card.hoverGifSrc ? (
+        {card.hoverGifSrc && videosReady ? (
           <div className="card-hover-gif">
             <video src={card.hoverGifSrc} autoPlay loop muted playsInline preload="none" className="ignore-load" />
           </div>

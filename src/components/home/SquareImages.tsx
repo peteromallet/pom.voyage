@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SquareImageData } from '../../data/home-cards';
 import { useImageHover } from '../../hooks/useImageHover';
+import { useSetVideosReady } from '../../hooks/useVideosReady';
 
 interface SquareImagesProps {
   images: SquareImageData[];
@@ -10,13 +11,27 @@ export function SquareImages({ images }: SquareImagesProps) {
   const { activeIndex, onEnter, onLeave, onToggle } = useImageHover(images.length);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const setVideosReady = useSetVideosReady();
+  const loadedCount = useRef(0);
 
-  // Preload all videos in background on mount
+  // Preload all videos in background on mount, signal when all are buffered
   useEffect(() => {
+    const fallback = setTimeout(setVideosReady, 5000);
     videoRefs.current.forEach((video) => {
-      if (video) video.preload = 'auto';
+      if (!video) return;
+      video.preload = 'auto';
+      const onCanPlay = () => {
+        video.removeEventListener('canplaythrough', onCanPlay);
+        loadedCount.current += 1;
+        if (loadedCount.current >= images.length) {
+          clearTimeout(fallback);
+          setVideosReady();
+        }
+      };
+      video.addEventListener('canplaythrough', onCanPlay);
     });
-  }, []);
+    return () => clearTimeout(fallback);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (playingIndex === null) return;
