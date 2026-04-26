@@ -53,15 +53,57 @@ describe('Recommendations media rendering', () => {
     expect(image).toHaveClass('media', 'media-full', 'media-wrap-block');
   });
 
-  it('renders a video media directive with controls and a source', () => {
-    const container = parseHtml(htmlFor(':::media{type=video src="v.mp4" width=full}\n:::'));
-    const video = container.querySelector('video');
+  it('renders a video media directive via the React video component, muted with an unmute control', () => {
+    const { container } = render(
+      <RecommendationsBody markdown={':::media{type=video src="v.mp4" width=full}\n:::'} />,
+    );
+    const frame = container.querySelector('.media-video-frame');
+    const video = frame?.querySelector('video');
     const source = video?.querySelector('source');
+    const unmute = screen.getByRole('button', { name: 'Unmute video' });
 
-    expect(video).toHaveClass('media', 'media-full', 'media-wrap-block');
+    expect(frame).toHaveClass('media', 'media-full', 'media-wrap-block');
     expect(video).toHaveAttribute('controls');
     expect(video).toHaveAttribute('playsinline');
+    expect(video?.muted).toBe(true);
     expect(source).toHaveAttribute('src', 'v.mp4');
+    expect(unmute).toBeVisible();
+
+    fireEvent.click(unmute);
+    expect(screen.queryByRole('button', { name: 'Unmute video' })).not.toBeInTheDocument();
+  });
+
+  it('renders title and button overlays on an image with optional links', () => {
+    const container = parseHtml(htmlFor(
+      ':::media{type=image src="x.png" alt="a" title="Studio" title_link="https://studio.example.com" button="Visit" button_link="https://shop.example.com"}\n:::',
+    ));
+
+    const frame = container.querySelector('.media-frame');
+    const title = frame?.querySelector('a.media-title');
+    const button = frame?.querySelector('a.media-button');
+
+    expect(frame).toHaveClass('media', 'media-full', 'media-wrap-block');
+    expect(title).toHaveAttribute('href', 'https://studio.example.com');
+    expect(title).toHaveTextContent('Studio');
+    expect(button).toHaveAttribute('href', 'https://shop.example.com');
+    expect(button).toHaveTextContent('Visit');
+  });
+
+  it('falls back to the media link when button has no explicit destination', () => {
+    const container = parseHtml(htmlFor(
+      ':::media{type=image src="x.png" link="https://primary.example.com" button="Open"}\n:::',
+    ));
+    const button = container.querySelector('a.media-button');
+
+    expect(button).toHaveAttribute('href', 'https://primary.example.com');
+  });
+
+  it('omits title and button overlays when not specified', () => {
+    const container = parseHtml(htmlFor(':::media{type=image src="x.png" alt="a"}\n:::'));
+
+    expect(container.querySelector('.media-title')).toBeNull();
+    expect(container.querySelector('.media-button')).toBeNull();
+    expect(container.querySelector('.media-frame')).toBeNull();
   });
 
   it('renders carousel items and disables boundary controls', () => {

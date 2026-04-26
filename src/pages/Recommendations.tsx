@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import { Header } from '../components/Header';
 import type { RecommendationEntry } from '../types';
@@ -15,6 +15,10 @@ export type MediaItem = {
   autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
+  title?: string;
+  titleLink?: string;
+  button?: string;
+  buttonLink?: string;
 };
 
 export type MediaBlock = {
@@ -39,12 +43,15 @@ export type RecommendationMarkdownPart =
 
 export type RenderedRecommendationSegment =
   | { type: 'html'; html: string }
-  | { type: 'carousel'; data: CarouselBlock };
+  | { type: 'carousel'; data: CarouselBlock }
+  | { type: 'video'; data: MediaBlock };
 
 const ATTRIBUTE_PATTERN = /(\w+)=(?:"([^"]*)"|(\S+))/g;
 const DIRECTIVE_OPEN_PATTERN = /^:::(media|carousel)\{([^}]*)\}\s*$/;
 const DIRECTIVE_CLOSE_PATTERN = /^:::\s*$/;
 const CAROUSEL_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--CAROUSEL:(\d+)-->(?:\s*<\/p>)?/g;
+const VIDEO_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--VIDEO:(\d+)-->(?:\s*<\/p>)?/g;
+const COMBINED_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--(CAROUSEL|VIDEO):(\d+)-->(?:\s*<\/p>)?/g;
 
 export function parseDirectiveAttributes(input: string): Record<string, string> {
   const attributes: Record<string, string> = {};
@@ -88,6 +95,10 @@ function parseMediaItem(attributes: Record<string, string>, context: string): Me
     autoplay: isEnabled(attributes.autoplay),
     loop: isEnabled(attributes.loop),
     muted: isEnabled(attributes.muted),
+    title: attributes.title,
+    titleLink: attributes.title_link,
+    button: attributes.button,
+    buttonLink: attributes.button_link,
   };
 }
 
@@ -177,52 +188,94 @@ function mediaClassName(width: MediaWidth, wrap: MediaWrap): string {
   return `media media-${width} media-wrap-${wrap}`;
 }
 
-function attribute(name: string, value: string | undefined): string {
-  return value ? ` ${name}="${escapeAttribute(value)}"` : '';
+function compileTitleHtml(item: MediaItem): string {
+  if (!item.title) return '';
+  const text = escapeAttribute(item.title);
+  if (item.titleLink) {
+    return `<a class="media-title" href="${escapeAttribute(item.titleLink)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+  }
+  return `<span class="media-title">${text}</span>`;
 }
 
-function compileMediaBlock(block: MediaBlock): string {
+function compileButtonHtml(item: MediaItem): string {
+  if (!item.button) return '';
+  const text = escapeAttribute(item.button);
+  const href = item.buttonLink ?? item.link;
+  if (href) {
+    return `<a class="media-button" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+  }
+  return `<span class="media-button">${text}</span>`;
+}
+
+function compileImageBlock(block: MediaBlock): string {
   const className = mediaClassName(block.width, block.wrap);
   const { item } = block;
+  const titleHtml = compileTitleHtml(item);
+  const buttonHtml = compileButtonHtml(item);
+  const hasOverlay = Boolean(titleHtml || buttonHtml);
 
-  if (item.kind === 'image') {
+  if (!hasOverlay) {
     const image = `<img class="${className}" src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt ?? '')}">`;
-
-    if (!item.link) {
-      return image;
-    }
-
+    if (!item.link) return image;
     return `<a href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">${image}</a>`;
   }
 
-  const booleanAttributes = [
-    item.autoplay ? ' autoplay' : '',
-    item.loop ? ' loop' : '',
-    item.muted ? ' muted' : '',
-  ].join('');
+  const innerImage = `<img src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt ?? '')}">`;
+  const linked = item.link
+    ? `<a class="media-link" href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">${innerImage}</a>`
+    : innerImage;
+  return `<div class="${className} media-frame">${linked}${titleHtml}${buttonHtml}</div>`;
+}
 
-  return `<video class="${className}" controls playsinline${attribute('poster', item.poster)}${booleanAttributes}><source src="${escapeAttribute(item.src)}"></video>`;
+function compileMediaBlock(
+  block: MediaBlock,
+  videos: MediaBlock[],
+): string {
+  if (block.item.kind === 'image') {
+    return compileImageBlock(block);
+  }
+  const videoIndex = videos.push(block) - 1;
+  return `<!--VIDEO:${videoIndex}-->`;
 }
 
 export function splitHtmlWithCarousels(
   html: string,
   carousels: CarouselBlock[],
 ): RenderedRecommendationSegment[] {
+  return splitHtmlWithBlocks(html, carousels, []);
+}
+
+export function splitHtmlWithBlocks(
+  html: string,
+  carousels: CarouselBlock[],
+  videos: MediaBlock[],
+): RenderedRecommendationSegment[] {
   const segments: RenderedRecommendationSegment[] = [];
   let lastIndex = 0;
 
-  for (const match of html.matchAll(CAROUSEL_PLACEHOLDER_PATTERN)) {
+  for (const match of html.matchAll(COMBINED_PLACEHOLDER_PATTERN)) {
     const matchIndex = match.index ?? 0;
     const htmlBefore = html.slice(lastIndex, matchIndex);
     if (htmlBefore) {
       segments.push({ type: 'html', html: htmlBefore });
     }
 
-    const carousel = carousels[Number(match[1])];
-    if (carousel) {
-      segments.push({ type: 'carousel', data: carousel });
+    const kind = match[1];
+    const idx = Number(match[2]);
+    if (kind === 'CAROUSEL') {
+      const carousel = carousels[idx];
+      if (carousel) {
+        segments.push({ type: 'carousel', data: carousel });
+      } else {
+        segments.push({ type: 'html', html: match[0] });
+      }
     } else {
-      segments.push({ type: 'html', html: match[0] });
+      const video = videos[idx];
+      if (video) {
+        segments.push({ type: 'video', data: video });
+      } else {
+        segments.push({ type: 'html', html: match[0] });
+      }
     }
 
     lastIndex = matchIndex + match[0].length;
@@ -237,7 +290,6 @@ export function splitHtmlWithCarousels(
 }
 
 export function sanitizeHtml(html: string) {
-  // Recommendation body_markdown is author-controlled, so this sanitizer stays intentionally permissive.
   return html
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
     .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
@@ -247,6 +299,7 @@ export function sanitizeHtml(html: string) {
 
 export function renderBody(markdown: string): RenderedRecommendationSegment[] {
   const carousels: CarouselBlock[] = [];
+  const videos: MediaBlock[] = [];
   const rewrittenMarkdown = parseRecommendationDirectiveBlocks(markdown)
     .map((part) => {
       if (part.kind === 'markdown') {
@@ -254,7 +307,7 @@ export function renderBody(markdown: string): RenderedRecommendationSegment[] {
       }
 
       if (part.kind === 'media') {
-        return compileMediaBlock(part);
+        return compileMediaBlock(part, videos);
       }
 
       const carouselIndex = carousels.push(part) - 1;
@@ -262,9 +315,10 @@ export function renderBody(markdown: string): RenderedRecommendationSegment[] {
     })
     .join('\n\n');
 
-  return splitHtmlWithCarousels(
+  return splitHtmlWithBlocks(
     sanitizeHtml(marked.parse(rewrittenMarkdown) as string),
     carousels,
+    videos,
   );
 }
 
@@ -331,6 +385,126 @@ function StatusBadge({ status }: { status: string }) {
   return <span className={config.className}>{config.label}</span>;
 }
 
+function MediaOverlays({ item }: { item: MediaItem }) {
+  return (
+    <>
+      {item.title && (
+        item.titleLink ? (
+          <a
+            className="media-title"
+            href={item.titleLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {item.title}
+          </a>
+        ) : (
+          <span className="media-title">{item.title}</span>
+        )
+      )}
+      {item.button && (
+        (() => {
+          const href = item.buttonLink ?? item.link;
+          return href ? (
+            <a
+              className="media-button"
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {item.button}
+            </a>
+          ) : (
+            <span className="media-button">{item.button}</span>
+          );
+        })()
+      )}
+    </>
+  );
+}
+
+export function MediaVideo({
+  item,
+  width,
+  wrap,
+  isActive = true,
+}: {
+  item: MediaItem;
+  width: MediaWidth;
+  wrap: MediaWrap;
+  isActive?: boolean;
+}) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [muted, setMuted] = useState(true);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current || typeof IntersectionObserver === 'undefined') return;
+    const node = containerRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting && entry.intersectionRatio > 0.4),
+      { threshold: [0, 0.4, 0.75] },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (inView && isActive) {
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    } else {
+      video.pause();
+    }
+  }, [inView, isActive]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = muted;
+  }, [muted]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`${mediaClassName(width, wrap)} media-frame media-video-frame`}
+    >
+      <video
+        ref={videoRef}
+        className="media-video"
+        controls
+        playsInline
+        muted
+        loop={item.loop !== false}
+        poster={item.poster}
+      >
+        <source src={item.src} />
+      </video>
+      {muted && (
+        <button
+          type="button"
+          className="media-unmute"
+          onClick={(e) => {
+            e.stopPropagation();
+            setMuted(false);
+          }}
+          aria-label="Unmute video"
+        >
+          <span aria-hidden="true">🔊</span> Tap to unmute
+        </button>
+      )}
+      <MediaOverlays item={item} />
+    </div>
+  );
+}
+
 export function Carousel({ items, width, wrap }: Pick<CarouselBlock, 'items' | 'width' | 'wrap'>) {
   const [index, setIndex] = useState(0);
   const currentItem = items[index];
@@ -358,19 +532,24 @@ export function Carousel({ items, width, wrap }: Pick<CarouselBlock, 'items' | '
       }}
     >
       {currentItem.kind === 'image' ? (
-        <img src={currentItem.src} alt={currentItem.alt ?? ''} className="media-carousel-item" />
+        <div className="media-carousel-slide media-frame">
+          {currentItem.link ? (
+            <a
+              className="media-link"
+              href={currentItem.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img src={currentItem.src} alt={currentItem.alt ?? ''} className="media-carousel-item" />
+            </a>
+          ) : (
+            <img src={currentItem.src} alt={currentItem.alt ?? ''} className="media-carousel-item" />
+          )}
+          <MediaOverlays item={currentItem} />
+        </div>
       ) : (
-        <video
-          className="media-carousel-item"
-          controls
-          playsInline
-          poster={currentItem.poster}
-          autoPlay={currentItem.autoplay === true}
-          loop={currentItem.loop === true}
-          muted={currentItem.muted === true}
-        >
-          <source src={currentItem.src} />
-        </video>
+        <MediaVideo item={currentItem} width="full" wrap="block" isActive />
       )}
       <div className="media-carousel-controls">
         <button
@@ -415,18 +594,29 @@ export function RecommendationsBody({
           className="recommendation-image"
         />
       )}
-      {renderBody(markdown).map((segment, index) => (
-        segment.type === 'html' ? (
-          <div key={`html-${index}`} dangerouslySetInnerHTML={{ __html: segment.html }} />
-        ) : (
-          <Carousel
-            key={`carousel-${index}`}
-            items={segment.data.items}
+      {renderBody(markdown).map((segment, index) => {
+        if (segment.type === 'html') {
+          return <div key={`html-${index}`} dangerouslySetInnerHTML={{ __html: segment.html }} />;
+        }
+        if (segment.type === 'carousel') {
+          return (
+            <Carousel
+              key={`carousel-${index}`}
+              items={segment.data.items}
+              width={segment.data.width}
+              wrap={segment.data.wrap}
+            />
+          );
+        }
+        return (
+          <MediaVideo
+            key={`video-${index}`}
+            item={segment.data.item}
             width={segment.data.width}
             wrap={segment.data.wrap}
           />
-        )
-      ))}
+        );
+      })}
     </div>
   );
 }
