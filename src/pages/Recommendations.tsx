@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import { Header } from '../components/Header';
 import type { RecommendationEntry } from '../types';
@@ -44,14 +44,13 @@ export type RecommendationMarkdownPart =
 export type RenderedRecommendationSegment =
   | { type: 'html'; html: string }
   | { type: 'carousel'; data: CarouselBlock }
-  | { type: 'video'; data: MediaBlock };
+  | { type: 'video'; data: MediaBlock }
+  | { type: 'image'; data: MediaBlock };
 
 const ATTRIBUTE_PATTERN = /(\w+)=(?:"([^"]*)"|(\S+))/g;
 const DIRECTIVE_OPEN_PATTERN = /^:::(media|carousel)\{([^}]*)\}\s*$/;
 const DIRECTIVE_CLOSE_PATTERN = /^:::\s*$/;
-const CAROUSEL_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--CAROUSEL:(\d+)-->(?:\s*<\/p>)?/g;
-const VIDEO_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--VIDEO:(\d+)-->(?:\s*<\/p>)?/g;
-const COMBINED_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--(CAROUSEL|VIDEO):(\d+)-->(?:\s*<\/p>)?/g;
+const COMBINED_PLACEHOLDER_PATTERN = /(?:<p>\s*)?<!--(CAROUSEL|VIDEO|IMAGE):(\d+)-->(?:\s*<\/p>)?/g;
 
 export function parseDirectiveAttributes(input: string): Record<string, string> {
   const attributes: Record<string, string> = {};
@@ -188,51 +187,29 @@ function mediaClassName(width: MediaWidth, wrap: MediaWrap): string {
   return `media media-${width} media-wrap-${wrap}`;
 }
 
-function compileTitleHtml(item: MediaItem): string {
-  if (!item.title) return '';
-  const text = escapeAttribute(item.title);
-  if (item.titleLink) {
-    return `<a class="media-title" href="${escapeAttribute(item.titleLink)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-  }
-  return `<span class="media-title">${text}</span>`;
+function hasOverlays(item: MediaItem): boolean {
+  return Boolean(item.title || item.button);
 }
 
-function compileButtonHtml(item: MediaItem): string {
-  if (!item.button) return '';
-  const text = escapeAttribute(item.button);
-  const href = item.buttonLink ?? item.link;
-  if (href) {
-    return `<a class="media-button" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-  }
-  return `<span class="media-button">${text}</span>`;
-}
-
-function compileImageBlock(block: MediaBlock): string {
+function compileFlatImage(block: MediaBlock): string {
   const className = mediaClassName(block.width, block.wrap);
   const { item } = block;
-  const titleHtml = compileTitleHtml(item);
-  const buttonHtml = compileButtonHtml(item);
-  const hasOverlay = Boolean(titleHtml || buttonHtml);
-
-  if (!hasOverlay) {
-    const image = `<img class="${className}" src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt ?? '')}">`;
-    if (!item.link) return image;
-    return `<a href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">${image}</a>`;
-  }
-
-  const innerImage = `<img src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt ?? '')}">`;
-  const linked = item.link
-    ? `<a class="media-link" href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">${innerImage}</a>`
-    : innerImage;
-  return `<div class="${className} media-frame">${linked}${titleHtml}${buttonHtml}</div>`;
+  const image = `<img class="${className}" src="${escapeAttribute(item.src)}" alt="${escapeAttribute(item.alt ?? '')}">`;
+  if (!item.link) return image;
+  return `<a href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">${image}</a>`;
 }
 
 function compileMediaBlock(
   block: MediaBlock,
   videos: MediaBlock[],
+  images: MediaBlock[],
 ): string {
   if (block.item.kind === 'image') {
-    return compileImageBlock(block);
+    if (!hasOverlays(block.item)) {
+      return compileFlatImage(block);
+    }
+    const imageIndex = images.push(block) - 1;
+    return `<!--IMAGE:${imageIndex}-->`;
   }
   const videoIndex = videos.push(block) - 1;
   return `<!--VIDEO:${videoIndex}-->`;
@@ -242,13 +219,14 @@ export function splitHtmlWithCarousels(
   html: string,
   carousels: CarouselBlock[],
 ): RenderedRecommendationSegment[] {
-  return splitHtmlWithBlocks(html, carousels, []);
+  return splitHtmlWithBlocks(html, carousels, [], []);
 }
 
 export function splitHtmlWithBlocks(
   html: string,
   carousels: CarouselBlock[],
   videos: MediaBlock[],
+  images: MediaBlock[] = [],
 ): RenderedRecommendationSegment[] {
   const segments: RenderedRecommendationSegment[] = [];
   let lastIndex = 0;
@@ -269,10 +247,17 @@ export function splitHtmlWithBlocks(
       } else {
         segments.push({ type: 'html', html: match[0] });
       }
-    } else {
+    } else if (kind === 'VIDEO') {
       const video = videos[idx];
       if (video) {
         segments.push({ type: 'video', data: video });
+      } else {
+        segments.push({ type: 'html', html: match[0] });
+      }
+    } else {
+      const image = images[idx];
+      if (image) {
+        segments.push({ type: 'image', data: image });
       } else {
         segments.push({ type: 'html', html: match[0] });
       }
@@ -300,6 +285,7 @@ export function sanitizeHtml(html: string) {
 export function renderBody(markdown: string): RenderedRecommendationSegment[] {
   const carousels: CarouselBlock[] = [];
   const videos: MediaBlock[] = [];
+  const images: MediaBlock[] = [];
   const rewrittenMarkdown = parseRecommendationDirectiveBlocks(markdown)
     .map((part) => {
       if (part.kind === 'markdown') {
@@ -307,7 +293,7 @@ export function renderBody(markdown: string): RenderedRecommendationSegment[] {
       }
 
       if (part.kind === 'media') {
-        return compileMediaBlock(part, videos);
+        return compileMediaBlock(part, videos, images);
       }
 
       const carouselIndex = carousels.push(part) - 1;
@@ -319,6 +305,7 @@ export function renderBody(markdown: string): RenderedRecommendationSegment[] {
     sanitizeHtml(marked.parse(rewrittenMarkdown) as string),
     carousels,
     videos,
+    images,
   );
 }
 
@@ -425,6 +412,63 @@ function MediaOverlays({ item }: { item: MediaItem }) {
   );
 }
 
+function useTapReveal(timeoutMs = 3000) {
+  const [revealed, setRevealed] = useState(false);
+  const timerRef = useRef<number | null>(null);
+
+  const reveal = useCallback(() => {
+    setRevealed(true);
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+    }
+    timerRef.current = window.setTimeout(() => {
+      setRevealed(false);
+      timerRef.current = null;
+    }, timeoutMs);
+  }, [timeoutMs]);
+
+  useEffect(() => () => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+    }
+  }, []);
+
+  return { revealed, reveal };
+}
+
+export function MediaImage({
+  item,
+  width,
+  wrap,
+}: {
+  item: MediaItem;
+  width: MediaWidth;
+  wrap: MediaWrap;
+}) {
+  const { revealed, reveal } = useTapReveal();
+  const className = `${mediaClassName(width, wrap)} media-frame${revealed ? ' media-revealed' : ''}`;
+  const image = (
+    <img src={item.src} alt={item.alt ?? ''} />
+  );
+
+  return (
+    <div className={className} onClick={reveal}>
+      {item.link ? (
+        <a
+          className="media-link"
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {image}
+        </a>
+      ) : image}
+      <MediaOverlays item={item} />
+    </div>
+  );
+}
+
 export function MediaVideo({
   item,
   width,
@@ -440,6 +484,7 @@ export function MediaVideo({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [muted, setMuted] = useState(true);
   const [inView, setInView] = useState(false);
+  const { revealed, reveal } = useTapReveal();
 
   useEffect(() => {
     if (!containerRef.current || typeof IntersectionObserver === 'undefined') return;
@@ -474,7 +519,8 @@ export function MediaVideo({
   return (
     <div
       ref={containerRef}
-      className={`${mediaClassName(width, wrap)} media-frame media-video-frame`}
+      className={`${mediaClassName(width, wrap)} media-frame media-video-frame${revealed ? ' media-revealed' : ''}`}
+      onClick={reveal}
     >
       <video
         ref={videoRef}
@@ -532,22 +578,7 @@ export function Carousel({ items, width, wrap }: Pick<CarouselBlock, 'items' | '
       }}
     >
       {currentItem.kind === 'image' ? (
-        <div className="media-carousel-slide media-frame">
-          {currentItem.link ? (
-            <a
-              className="media-link"
-              href={currentItem.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img src={currentItem.src} alt={currentItem.alt ?? ''} className="media-carousel-item" />
-            </a>
-          ) : (
-            <img src={currentItem.src} alt={currentItem.alt ?? ''} className="media-carousel-item" />
-          )}
-          <MediaOverlays item={currentItem} />
-        </div>
+        <MediaImage item={currentItem} width="full" wrap="block" />
       ) : (
         <MediaVideo item={currentItem} width="full" wrap="block" isActive />
       )}
@@ -603,6 +634,16 @@ export function RecommendationsBody({
             <Carousel
               key={`carousel-${index}`}
               items={segment.data.items}
+              width={segment.data.width}
+              wrap={segment.data.wrap}
+            />
+          );
+        }
+        if (segment.type === 'image') {
+          return (
+            <MediaImage
+              key={`image-${index}`}
+              item={segment.data.item}
               width={segment.data.width}
               wrap={segment.data.wrap}
             />

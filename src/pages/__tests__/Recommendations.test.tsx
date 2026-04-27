@@ -73,26 +73,34 @@ describe('Recommendations media rendering', () => {
     expect(screen.queryByRole('button', { name: 'Unmute video' })).not.toBeInTheDocument();
   });
 
-  it('renders title and button overlays on an image with optional links', () => {
-    const container = parseHtml(htmlFor(
-      ':::media{type=image src="x.png" alt="a" title="Studio" title_link="https://studio.example.com" button="Visit" button_link="https://shop.example.com"}\n:::',
-    ));
+  it('renders title and button overlays on an image with optional links and reveals on tap', () => {
+    const { container } = render(
+      <RecommendationsBody markdown={
+        ':::media{type=image src="x.png" alt="a" title="Studio" title_link="https://studio.example.com" button="Visit" button_link="https://shop.example.com"}\n:::'
+      } />,
+    );
 
     const frame = container.querySelector('.media-frame');
     const title = frame?.querySelector('a.media-title');
     const button = frame?.querySelector('a.media-button');
 
     expect(frame).toHaveClass('media', 'media-full', 'media-wrap-block');
+    expect(frame).not.toHaveClass('media-revealed');
     expect(title).toHaveAttribute('href', 'https://studio.example.com');
     expect(title).toHaveTextContent('Studio');
     expect(button).toHaveAttribute('href', 'https://shop.example.com');
     expect(button).toHaveTextContent('Visit');
+
+    fireEvent.click(frame!);
+    expect(frame).toHaveClass('media-revealed');
   });
 
   it('falls back to the media link when button has no explicit destination', () => {
-    const container = parseHtml(htmlFor(
-      ':::media{type=image src="x.png" link="https://primary.example.com" button="Open"}\n:::',
-    ));
+    const { container } = render(
+      <RecommendationsBody markdown={
+        ':::media{type=image src="x.png" link="https://primary.example.com" button="Open"}\n:::'
+      } />,
+    );
     const button = container.querySelector('a.media-button');
 
     expect(button).toHaveAttribute('href', 'https://primary.example.com');

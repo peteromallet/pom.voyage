@@ -3076,6 +3076,21 @@ a.media-button:hover {
   background: rgba(20, 20, 28, 0.9);
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .media-frame > .media-title,
+  .media-frame > .media-button {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .media-frame.media-revealed > .media-title,
+  .media-frame.media-revealed > .media-button {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
 .media-carousel-controls {
   display: flex;
   gap: 0.75rem;
