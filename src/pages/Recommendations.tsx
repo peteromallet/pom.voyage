@@ -317,11 +317,28 @@ export function RecommendationsPage({ recommendations: ssrData }: Props) {
   const [recommendations, setRecommendations] = useState<RecommendationEntry[]>(ssrData ?? []);
 
   useEffect(() => {
+    if (recommendations.length === 0) return;
+    const openFromHash = () => {
+      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+      if (!hash) return;
+      const target = document.getElementById(hash);
+      if (!target || target.tagName !== 'DETAILS') return;
+      (target as HTMLDetailsElement).open = true;
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+    return () => window.removeEventListener('hashchange', openFromHash);
+  }, [recommendations]);
+
+  useEffect(() => {
     if (ssrData && ssrData.length > 0) return;
     const config = window.__APP_CONFIG__;
     if (!config?.supabaseUrl || !config?.supabaseAnonKey) return;
     fetch(
-      `${config.supabaseUrl}/rest/v1/recommendations?order=sort_order.asc&select=id,name,role_title,emoji,linkedin_url,location,body_markdown,image_url,intro_url,context,status,is_hired,is_freelancer,sort_order,created_at`,
+      `${config.supabaseUrl}/rest/v1/recommendations?order=created_at.desc&select=id,name,role_title,emoji,linkedin_url,location,body_markdown,image_url,intro_url,context,status,is_hired,is_freelancer,sort_order,created_at`,
       {
         headers: {
           apikey: config.supabaseAnonKey,
@@ -370,6 +387,43 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
 function StatusBadge({ status }: { status: string }) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.probably_unavailable;
   return <span className={config.className}>{config.label}</span>;
+}
+
+export function recommendationSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'recommendation';
+}
+
+function CopyLinkButton({ slug }: { slug: string }) {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <button
+      type="button"
+      className="recommendation-share-link"
+      aria-label="Copy direct link to this recommendation"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+        const done = () => {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 1600);
+        };
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(url).then(done).catch(done);
+        } else {
+          done();
+        }
+      }}
+    >
+      {copied ? '✓ Copied' : '🔗 Copy link'}
+    </button>
+  );
 }
 
 function MediaOverlays({ item }: { item: MediaItem }) {
@@ -663,8 +717,9 @@ export function RecommendationsBody({
 }
 
 function RecommendationCard({ rec }: { rec: RecommendationEntry }) {
+  const slug = recommendationSlug(rec.name);
   return (
-    <details className="recommendation-card">
+    <details className="recommendation-card" id={slug}>
       <summary className="recommendation-summary">
         <div className="recommendation-summary-content">
           {rec.image_url && (
@@ -699,6 +754,7 @@ function RecommendationCard({ rec }: { rec: RecommendationEntry }) {
             <div className="mt-0.5 text-[0.8rem] text-[#666]">{rec.role_title}</div>
           </div>
           <StatusBadge status={rec.status} />
+          <CopyLinkButton slug={slug} />
         </div>
       </summary>
       <div className="recommendation-expanded">

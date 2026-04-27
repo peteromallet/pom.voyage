@@ -3035,6 +3035,15 @@ a.media-title:hover {
   background: rgba(20, 20, 28, 0.78);
 }
 
+a.media-title::after,
+a.media-button::after {
+  content: ' ↗';
+  display: inline-block;
+  margin-left: 0.18em;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
 .media-button {
   position: absolute;
   top: 0.55rem;
@@ -3130,6 +3139,30 @@ a.media-button:hover {
     float: none;
     margin: 1.5rem auto;
   }
+}
+
+.recommendation-share-link {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  border: 1px solid rgba(120, 120, 140, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.18rem 0.55rem;
+  color: #555;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.recommendation-card[open] .recommendation-share-link {
+  display: inline-flex;
+}
+
+.recommendation-share-link:hover {
+  background: #fff;
+  color: #222;
 }
 
 .recommendation-context {
