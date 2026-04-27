@@ -482,7 +482,7 @@ export function MediaVideo({
         controls
         playsInline
         muted
-        loop={item.loop !== false}
+        loop={item.loop === true}
         poster={item.poster}
       >
         <source src={item.src} />
